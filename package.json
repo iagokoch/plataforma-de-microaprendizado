@@ -1,0 +1,27 @@
+{
+  "name": "plataforma-de-microaprendizado",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iagokoch/plataforma-de-microaprendizado.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/iagokoch/plataforma-de-microaprendizado/issues"
+  },
+  "homepage": "https://github.com/iagokoch/plataforma-de-microaprendizado#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "mysql2": "^3.14.0"
+  }
+}
