@@ -17,9 +17,13 @@ const userRoutes = require('./routes/users');
 // Usar rotas
 app.use('/api/users', userRoutes);
 
-// Rota principal
+// Rotas de visualização
 app.get('/', (req, res) => {
     res.render('index', { title: 'Home' });
+});
+
+app.get('/dashboard', (req, res) => {
+    res.render('dashboard', { title: 'Dashboard' });
 });
 
 // Outras rotas aqui...
