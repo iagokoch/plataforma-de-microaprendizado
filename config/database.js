@@ -1,21 +1,13 @@
 const mysql = require('mysql2/promise');
 
-const dbConfig = {
+const pool = mysql.createPool({
     host: 'localhost',
-    user: 'root', // Altere para seu usuário do MySQL
-    password: '', // Altere para sua senha do MySQL
-    database: 'microaprendizado'
-};
+    user: 'root',
+    password: '', // Senha padrão do XAMPP é vazia
+    database: 'microlearn',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-async function conectar() {
-    try {
-        const conexao = await mysql.createConnection(dbConfig);
-        console.log('Conectado ao MySQL com sucesso!');
-        return conexao;
-    } catch (erro) {
-        console.error('Erro ao conectar ao MySQL:', erro);
-        throw erro;
-    }
-}
-
-module.exports = { conectar }; 
+module.exports = pool; 
