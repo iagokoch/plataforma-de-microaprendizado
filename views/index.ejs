@@ -1,9 +1,34 @@
-<%- include('partials/header') %>
-<%- include('partials/navbar') %>
-
-<!-- Conteúdo Principal -->
-<main class="container mx-auto px-4 py-8">
-    <!-- Aqui você pode adicionar o conteúdo principal da página -->
-</main>
-
-<%- include('partials/footer') %> 
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - MicroLearn</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img src="/images/logo-microlearn.png" alt="MicroLearn Logo" />
+      </div>
+      <form id="loginForm" onsubmit="return handleSubmit(event)">
+        <div class="form-group">
+          <label for="emailCpf">Email/CPF:</label>
+          <input type="text" id="emailCpf" name="emailCpf" required />
+        </div>
+        <div class="form-group">
+          <label for="senha">Senha:</label>
+          <input type="password" id="senha" name="senha" required />
+        </div>
+        <div class="forgot-password">
+          <a href="#">Esqueceu a senha?</a>
+        </div>
+        <button type="submit" class="btn">ENTRAR</button>
+        <div class="register-link">
+          <p>Não tem uma conta? <a href="/cadastro">Cadastre-se</a></p>
+        </div>
+      </form>
+    </div>
+    <script src="/javascripts/login.js"></script>
+  </body>
+</html>

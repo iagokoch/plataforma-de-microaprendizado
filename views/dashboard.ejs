@@ -1,72 +1,91 @@
-<%- include('partials/header', { title: 'Dashboard' }) %>
-<%- include('partials/navbar') %>
-
-<!-- Conteúdo Principal -->
-<main class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Card de Tarefas -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Tarefas</h2>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                    <div>
-                        <h3 class="font-medium text-gray-800">Tarefa 1</h3>
-                        <p class="text-sm text-gray-600">Descrição da tarefa 1</p>
-                    </div>
-                    <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">Pendente</span>
-                </div>
-                <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                    <div>
-                        <h3 class="font-medium text-gray-800">Tarefa 2</h3>
-                        <p class="text-sm text-gray-600">Descrição da tarefa 2</p>
-                    </div>
-                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Concluída</span>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MicroLearn - Dashboard</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Barra de navegação -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <img
+          src="/images/logo-microlearn.png"
+          alt="MicroLearn Logo"
+          class="nav-logo"
+        />
+        <a href="/dashboard" class="nav-link">HOME</a>
+        <a href="/perguntas" class="nav-link">Perguntas</a>
+      </div>
+      <div class="nav-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar..." />
+          <button type="button" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
         </div>
+      </div>
+      <div class="nav-right">
+        <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
+        <a href="/perfil" class="profile-icon">
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
+      </div>
+    </nav>
 
-        <!-- Card de Progresso -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Progresso</h2>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Curso 1</span>
-                    <div class="w-32 bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-primary h-2.5 rounded-full" style="width: 75%"></div>
-                    </div>
-                    <span class="text-sm text-gray-600">75%</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-600">Curso 2</span>
-                    <div class="w-32 bg-gray-200 rounded-full h-2.5">
-                        <div class="bg-primary h-2.5 rounded-full" style="width: 45%"></div>
-                    </div>
-                    <span class="text-sm text-gray-600">45%</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card de Notificações -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Notificações</h2>
-            <div class="space-y-4">
-                <div class="flex items-start space-x-3 p-3 bg-purple-50 rounded-lg">
-                    <div class="w-2 h-2 mt-2 bg-primary rounded-full"></div>
-                    <div>
-                        <p class="text-sm text-gray-800">Nova tarefa disponível</p>
-                        <span class="text-xs text-gray-500">Há 2 horas</span>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3 p-3 bg-purple-50 rounded-lg">
-                    <div class="w-2 h-2 mt-2 bg-primary rounded-full"></div>
-                    <div>
-                        <p class="text-sm text-gray-800">Curso atualizado</p>
-                        <span class="text-xs text-gray-500">Ontem</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Título da página -->
+    <div class="page-title">
+      <h1>Gráfico sequencia de dias</h1>
     </div>
-</main>
 
-<%- include('partials/footer') %> 
+    <!-- Menu de matérias -->
+    <div class="subjects-menu">
+      <a href="/matematica" class="subject-link">Matemática</a>
+      <a href="/ciencias" class="subject-link">Ciências</a>
+      <a href="/lingua-portuguesa" class="subject-link">Língua Portuguesa</a>
+      <a href="/geografia" class="subject-link">Geografia</a>
+      <a href="/filosofia" class="subject-link">Filosofia</a>
+      <a href="/mais" class="subject-link">Mais</a>
+    </div>
+
+    <!-- Grid de vídeos -->
+    <div class="video-grid">
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+      <div class="video-card">
+        <div class="video-placeholder">Vídeo</div>
+      </div>
+    </div>
+
+    <!-- Seção de links -->
+    <div class="links-section">
+      <h2>Links</h2>
+      <!-- Adicione seus links aqui -->
+    </div>
+  </body>
+</html>
