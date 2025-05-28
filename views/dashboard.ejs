@@ -11,7 +11,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
   </head>
-  <body>
+  <body id="top">
     <!-- Barra de navegação -->
     <nav class="navbar">
       <div class="nav-left">
@@ -20,7 +20,7 @@
           alt="MicroLearn Logo"
           class="nav-logo"
         />
-        <a href="/dashboard" class="nav-link">HOME</a>
+        <a href="#top" class="nav-link">HOME</a>
         <a href="/perguntas" class="nav-link">Perguntas</a>
       </div>
       <div class="nav-center">
@@ -33,15 +33,54 @@
       </div>
       <div class="nav-right">
         <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
-        <a href="/perfil" class="profile-icon">
+        <a href="/cadastro" class="profile-icon">
           <i class="fa-solid fa-circle-user"></i>
         </a>
       </div>
     </nav>
 
-    <!-- Título da página -->
+    <!-- Título da página e gráfico/mensagem -->
     <div class="page-title">
-      <h1>Gráfico sequencia de dias</h1>
+      <% if (!user) { %>
+      <p style="color: #7950f2; font-size: 1.2rem; margin-top: 1rem">
+        Faça Login para ter acesso ao gráfico
+      </p>
+      <% } else { %>
+      <canvas
+        id="sequenciaGrafico"
+        width="400"
+        height="150"
+        style="margin-top: 1rem"
+      ></canvas>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script>
+        // Exemplo de dados fictícios para o gráfico
+        const ctx = document
+          .getElementById("sequenciaGrafico")
+          .getContext("2d");
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+            datasets: [
+              {
+                label: "Dias de estudo",
+                data: [1, 1, 0, 1, 1, 0, 1],
+                borderColor: "#7950f2",
+                backgroundColor: "rgba(121, 80, 242, 0.1)",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              y: { beginAtZero: true, stepSize: 1 },
+            },
+          },
+        });
+      </script>
+      <% } %>
     </div>
 
     <!-- Menu de matérias -->
@@ -58,27 +97,227 @@
     <div class="video-grid">
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
       <div class="video-card">
         <div class="video-placeholder">Vídeo</div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #eee;
+          "
+        >
+          <button
+            class="btn-ver-aula"
+            style="
+              background: #7950f2;
+              color: white;
+              border: none;
+              border-radius: 6px;
+              padding: 0.5rem 1.2rem;
+              font-size: 1rem;
+              cursor: pointer;
+              transition: background 0.2s;
+            "
+          >
+            Ver Aula
+          </button>
+        </div>
       </div>
     </div>
 

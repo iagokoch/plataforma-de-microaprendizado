@@ -10,17 +10,17 @@ const requireLogin = (req, res, next) => {
 
 // Página inicial (dashboard)
 router.get("/", requireLogin, (req, res) => {
-  res.render("dashboard");
+  res.render("dashboard", { user: null });
 });
 
 // Página de login
 router.get("/login", (req, res) => {
-  res.render("index");
+  res.render("index", { user: null });
 });
 
 // Página de cadastro
 router.get("/cadastro", (req, res) => {
-  res.render("cadastro");
+  res.render("cadastro", { user: null });
 });
 
 module.exports = router;
