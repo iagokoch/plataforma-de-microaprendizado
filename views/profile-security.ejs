@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Segurança do Perfil - MicroLearn</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Basic styles from dashboard.css or similar */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background: #f3eaff;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-left,
+      .nav-center,
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+      .nav-logo {
+        height: 40px;
+        margin-right: 1rem;
+      }
+      .nav-link {
+        color: #222;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      .nav-link:hover {
+        color: #7950f2;
+      }
+      .profile-icon {
+        font-size: 2rem;
+        color: #7950f2;
+        margin-left: 1rem;
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 6px;
+        padding: 0.2rem 0.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 0.4rem;
+        font-size: 1rem;
+        background: transparent;
+      }
+      .search-button {
+        background: none;
+        border: none;
+        color: #7950f2;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      .page-title {
+        background: #f3eaff;
+        padding: 1.5rem 0 1rem 0;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #222;
+        margin-bottom: 2rem;
+      }
+
+      .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        gap: 2rem;
+      }
+
+      .sidebar {
+        flex: 0 0 200px; /* Fixed width for sidebar */
+        background: #f3eaff;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(121, 80, 242, 0.05);
+      }
+
+      .sidebar-link {
+        display: block;
+        text-decoration: none;
+        color: #222;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        transition: background-color 0.2s, color 0.2s;
+      }
+
+      .sidebar-link:hover {
+        background-color: #e9d8ff;
+        color: #7950f2;
+      }
+
+      .sidebar-link.active {
+        background-color: #7950f2;
+        color: white;
+        font-weight: bold;
+      }
+
+      .sidebar-link.logout {
+        background-color: #ff6b6b;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 2rem; /* Space above logout button */
+      }
+      .sidebar-link.logout:hover {
+        background-color: #ff4c4c;
+      }
+
+      .profile-content {
+        flex-grow: 1;
+        background: #fff;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .profile-content h3 {
+        color: #7950f2;
+        margin-bottom: 1.5rem;
+        font-size: 1.4rem;
+      }
+
+      .profile-form .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .profile-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .profile-form input[type="password"] {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      .profile-form .form-actions {
+        text-align: right;
+        margin-top: 2rem;
+      }
+
+      .profile-form button {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .profile-form .btn-primary {
+        background-color: #7950f2;
+        color: white;
+      }
+      .profile-form .btn-primary:hover {
+        background-color: #5f3dc4;
+      }
+
+      .profile-form .btn-secondary {
+        background-color: #ccc;
+        color: #333;
+        margin-right: 1rem;
+      }
+      .profile-form .btn-secondary:hover {
+        background-color: #bbb;
+      }
+    </style>
+  </head>
+  <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <img
+          src="/images/logo-microlearn.png"
+          alt="MicroLearn Logo"
+          class="nav-logo"
+        />
+        <a href="/" class="nav-link">HOME</a>
+        <a href="/perguntas" class="nav-link">Perguntas</a>
+      </div>
+      <div class="nav-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar..." />
+          <button type="button" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
+        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Título da página -->
+    <div class="page-title">Meu Perfil</div>
+
+    <div class="profile-container">
+      <!-- Sidebar de Navegação -->
+      <div class="sidebar">
+        <a href="/profile" class="sidebar-link">Dados Pessoais</a>
+        <a href="/profile/security" class="sidebar-link active">Segurança</a>
+        <a href="/profile/theme" class="sidebar-link">Tema</a>
+        <a href="#" class="sidebar-link">Meu Progresso</a>
+        <a href="#" class="sidebar-link logout">Sair da Conta</a>
+      </div>
+
+      <!-- Conteúdo Principal do Perfil - Segurança -->
+      <div class="profile-content">
+        <h3>Segurança</h3>
+
+        <form class="profile-form">
+          <p style="margin-bottom: 1.5rem; color: #555">Altere sua senha</p>
+
+          <div class="form-group">
+            <label for="current-password">Senha atual</label>
+            <input
+              type="password"
+              id="current-password"
+              name="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="new-password">Nova senha</label>
+            <input type="password" id="new-password" name="new-password" />
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password">Confirme a nova senha</label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+            />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Optional: Add a footer if needed -->
+    <!-- Include your footer EJS partial here if you have one -->
+  </body>
+</html>

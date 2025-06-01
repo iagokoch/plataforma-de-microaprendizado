@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurações de Tema - MicroLearn</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Basic styles from dashboard.css or similar */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background: #f3eaff;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-left,
+      .nav-center,
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+      .nav-logo {
+        height: 40px;
+        margin-right: 1rem;
+      }
+      .nav-link {
+        color: #222;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      .nav-link:hover {
+        color: #7950f2;
+      }
+      .profile-icon {
+        font-size: 2rem;
+        color: #7950f2;
+        margin-left: 1rem;
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 6px;
+        padding: 0.2rem 0.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 0.4rem;
+        font-size: 1rem;
+        background: transparent;
+      }
+      .search-button {
+        background: none;
+        border: none;
+        color: #7950f2;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      .page-title {
+        background: #f3eaff;
+        padding: 1.5rem 0 1rem 0;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #222;
+        margin-bottom: 2rem;
+      }
+
+      .profile-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        display: flex;
+        gap: 2rem;
+      }
+
+      .sidebar {
+        flex: 0 0 200px; /* Fixed width for sidebar */
+        background: #f3eaff;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(121, 80, 242, 0.05);
+      }
+
+      .sidebar-link {
+        display: block;
+        text-decoration: none;
+        color: #222;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        border-radius: 4px;
+        transition: background-color 0.2s, color 0.2s;
+      }
+
+      .sidebar-link:hover {
+        background-color: #e9d8ff;
+        color: #7950f2;
+      }
+
+      .sidebar-link.active {
+        background-color: #7950f2;
+        color: white;
+        font-weight: bold;
+      }
+
+      .sidebar-link.logout {
+        background-color: #ff6b6b;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 2rem; /* Space above logout button */
+      }
+      .sidebar-link.logout:hover {
+        background-color: #ff4c4c;
+      }
+
+      .profile-content {
+        flex-grow: 1;
+        background: #fff;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .profile-content h3 {
+        color: #7950f2;
+        margin-bottom: 1.5rem;
+        font-size: 1.4rem;
+      }
+
+      .theme-options .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .theme-options label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .theme-options .option-item {
+        display: flex;
+        align-items: center;
+        background: #f3eaff;
+        padding: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-bottom: 0.8rem; /* Space between options */
+      }
+
+      .theme-options .option-item:hover {
+        background-color: #e9d8ff;
+      }
+
+      .theme-options input[type="radio"] {
+        margin-right: 0.8rem;
+        accent-color: #7950f2; /* Style the radio button color */
+      }
+
+      .form-actions {
+        text-align: right;
+        margin-top: 2rem;
+      }
+
+      .form-actions button {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .form-actions .btn-primary {
+        background-color: #7950f2;
+        color: white;
+      }
+      .form-actions .btn-primary:hover {
+        background-color: #5f3dc4;
+      }
+
+      .form-actions .btn-secondary {
+        background-color: #ccc;
+        color: #333;
+        margin-right: 1rem;
+      }
+      .form-actions .btn-secondary:hover {
+        background-color: #bbb;
+      }
+    </style>
+  </head>
+  <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <img
+          src="/images/logo-microlearn.png"
+          alt="MicroLearn Logo"
+          class="nav-logo"
+        />
+        <a href="/" class="nav-link">HOME</a>
+        <a href="/perguntas" class="nav-link">Perguntas</a>
+      </div>
+      <div class="nav-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar..." />
+          <button type="button" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
+        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Título da página -->
+    <div class="page-title">Meu Perfil</div>
+
+    <div class="profile-container">
+      <!-- Sidebar de Navegação -->
+      <div class="sidebar">
+        <a href="/profile" class="sidebar-link">Dados Pessoais</a>
+        <a href="/profile/security" class="sidebar-link">Segurança</a>
+        <a href="/profile/theme" class="sidebar-link active">Tema</a>
+        <a href="#" class="sidebar-link">Meu Progresso</a>
+        <a href="#" class="sidebar-link logout">Sair da Conta</a>
+      </div>
+
+      <!-- Conteúdo Principal do Perfil - Tema -->
+      <div class="profile-content">
+        <h3>Tema</h3>
+
+        <form class="theme-options">
+          <p style="margin-bottom: 1.5rem; color: #555">Escolhe seu tema</p>
+
+          <div class="option-item">
+            <input
+              type="radio"
+              id="light-theme"
+              name="theme"
+              value="light"
+              checked
+            />
+            <label for="light-theme">Tema claro</label>
+          </div>
+
+          <div class="option-item">
+            <input type="radio" id="dark-theme" name="theme" value="dark" />
+            <label for="dark-theme">Tema escuro</label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Optional: Add a footer if needed -->
+    <!-- Include your footer EJS partial here if you have one -->
+
+    <script>
+      const themeForm = document.querySelector(".theme-options");
+
+      if (themeForm) {
+        themeForm.addEventListener("submit", async (event) => {
+          event.preventDefault(); // Prevent default form submission
+
+          const selectedTheme = themeForm.querySelector(
+            'input[name="theme"]:checked'
+          ).value;
+
+          try {
+            const response = await fetch("/api/user/theme", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ theme: selectedTheme }),
+            });
+
+            const result = await response.json();
+
+            if (result.sucesso) {
+              alert("Tema atualizado com sucesso!");
+              // Optionally reload the page or update the UI based on the new theme
+              window.location.reload();
+            } else {
+              alert("Erro ao atualizar o tema: " + result.mensagem);
+            }
+          } catch (error) {
+            console.error("Error saving theme:", error);
+            alert("Erro ao conectar com o servidor para salvar o tema.");
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

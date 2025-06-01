@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aula - MicroLearn</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Basic styles from dashboard.css or similar */
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+      }
+
+      .navbar {
+        background: #f3eaff;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-left,
+      .nav-center,
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+      .nav-logo {
+        height: 40px;
+        margin-right: 1rem;
+      }
+      .nav-link {
+        color: #222;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      .nav-link:hover {
+        color: #7950f2;
+      }
+      .profile-icon {
+        font-size: 2rem;
+        color: #7950f2;
+        margin-left: 1rem;
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 6px;
+        padding: 0.2rem 0.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 0.4rem;
+        font-size: 1rem;
+        background: transparent;
+      }
+      .search-button {
+        background: none;
+        border: none;
+        color: #7950f2;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+
+      .page-title {
+        background: #f3eaff;
+        padding: 1.5rem 0 1rem 0;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #222;
+        margin-bottom: 1rem;
+      }
+
+      .subjects-menu {
+        display: flex;
+        justify-content: center;
+        background: #f3eaff;
+        padding: 0.8rem 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+      }
+
+      .subject-link {
+        text-decoration: none;
+        color: #222;
+        margin: 0 1rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .subject-link:hover {
+        color: #7950f2;
+        border-bottom: 2px solid #7950f2; /* Highlight effect */
+        padding-bottom: 4px; /* Space for the underline */
+      }
+
+      .aula-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .video-section {
+        margin-bottom: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .video-placeholder-aula {
+        width: 100%;
+        height: 450px; /* Adjust height as needed */
+        background-color: #ddd; /* Placeholder color */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #666;
+      }
+
+      .question-section {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .question-section h3 {
+        color: #7950f2;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 1.4rem;
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .option-item {
+        display: flex;
+        align-items: center;
+        background: #f3eaff;
+        padding: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .option-item:hover {
+        background-color: #e9d8ff;
+      }
+
+      .option-item input[type="radio"] {
+        margin-right: 0.8rem;
+        accent-color: #7950f2; /* Style the radio button color */
+      }
+
+      .option-item label {
+        flex-grow: 1; /* Ensure label takes available space */
+        cursor: pointer; /* Keep cursor as pointer for label */
+      }
+    </style>
+  </head>
+  <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <img
+          src="/images/logo-microlearn.png"
+          alt="MicroLearn Logo"
+          class="nav-logo"
+        />
+        <a href="/" class="nav-link">HOME</a>
+        <a href="/perguntas" class="nav-link">Perguntas</a>
+      </div>
+      <div class="nav-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar..." />
+          <button type="button" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
+        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Título da página (pode ser o título da aula) -->
+    <div class="page-title">Título da Aula</div>
+
+    <!-- Menu de matérias -->
+    <div class="subjects-menu">
+      <a href="/matematica" class="subject-link">Matemática</a>
+      <a href="/ciencias" class="subject-link">Ciências</a>
+      <a href="/lingua-portuguesa" class="subject-link">Língua Portuguesa</a>
+      <a href="/geografia" class="subject-link">Geografia</a>
+      <a href="/filosofia" class="subject-link">Filosofia</a>
+      <a href="/mais" class="subject-link">Mais</a>
+    </div>
+
+    <div class="aula-container">
+      <!-- Seção do Vídeo -->
+      <div class="video-section">
+        <div class="video-placeholder-aula">Vídeo Placeholder</div>
+        <!-- Embed your video player here -->
+        <!-- <iframe width="100%" height="450" src="YOUR_VIDEO_URL" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+      </div>
+
+      <!-- Seção de Perguntas e Respostas -->
+      <div class="question-section">
+        <h3>Pergunta Relacionada à Aula</h3>
+        <!-- Replace with actual question text from backend -->
+        <p>Qual a capital do Brasil?</p>
+
+        <div class="options-grid">
+          <!-- Replace with dynamically loaded options from backend -->
+          <div class="option-item">
+            <input type="radio" id="option1" name="question1" value="opcao1" />
+            <label for="option1">Resposta 1</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="option2" name="question1" value="opcao2" />
+            <label for="option2">Resposta 2</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="option3" name="question1" value="opcao3" />
+            <label for="option3">Resposta 3</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="option4" name="question1" value="opcao4" />
+            <label for="option4">Resposta 4</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" id="option5" name="question1" value="opcao5" />
+            <label for="option5">Resposta 5</label>
+          </div>
+        </div>
+
+        <!-- Optional: Add a button to submit the answer -->
+        <!-- <button>Responder</button> -->
+      </div>
+
+      <!-- You might add other sections here, like comments or related materials -->
+    </div>
+
+    <!-- Optional: Add a footer if needed -->
+    <!-- Include your footer EJS partial here if you have one -->
+
+    <script>
+      // Get the aula ID from the URL
+      const path = window.location.pathname;
+      const aulaId = path.split("/").pop();
+
+      const pageTitle = document.querySelector(".page-title");
+      const videoSection = document.querySelector(".video-section");
+      const questionSection = document.querySelector(".question-section");
+      const subjectsMenu = document.querySelector(".subjects-menu");
+
+      // Add click event listener for subject links
+      subjectsMenu.addEventListener("click", (event) => {
+        event.preventDefault();
+        const target = event.target;
+        if (target.classList.contains("subject-link")) {
+          // Remove active class from all links
+          subjectsMenu.querySelectorAll(".subject-link").forEach((link) => {
+            link.classList.remove("active");
+          });
+          // Add active class to the clicked link
+          target.classList.add("active");
+        }
+      });
+
+      // Function to fetch and display aula data
+      async function fetchAulaData(id) {
+        try {
+          const response = await fetch(`/api/aulas/${id}`);
+          if (!response.ok) {
+            if (response.status === 404) {
+              throw new Error("Aula not found");
+            } else {
+              throw new Error(
+                `Error fetching aula data: ${response.statusText}`
+              );
+            }
+          }
+          const aulaData = await response.json();
+
+          console.log("Fetched Aula Data:", aulaData); // Debugging
+
+          // Update the page title
+          pageTitle.textContent = aulaData.titulo || "Título da Aula";
+
+          // Embed the video
+          if (aulaData.video_url) {
+            videoSection.innerHTML = `
+              <iframe width="100%" height="450" src="${aulaData.video_url}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            `;
+          } else {
+            videoSection.innerHTML =
+              '<div class="video-placeholder-aula">Vídeo não disponível</div>';
+          }
+
+          // Populate the question section
+          if (aulaData.pergunta) {
+            questionSection.innerHTML = `
+              <h3>${aulaData.pergunta.texto}</h3>
+              <div class="options-grid">
+                ${aulaData.pergunta.opcoes
+                  .map(
+                    (opcao) => `
+                  <div class="option-item">
+                    <input type="radio" id="option${opcao.id}" name="question_${aulaData.pergunta.id}" value="${opcao.id}">
+                    <label for="option${opcao.id}">${opcao.texto}</label>
+                  </div>
+                `
+                  )
+                  .join("")}
+              </div>
+              <!-- Optional: Add a button to submit the answer -->
+              <!-- <button>Responder</button> -->
+            `;
+          } else {
+            questionSection.innerHTML =
+              '<p style="text-align: center; color: #666;">Nenhuma pergunta disponível para esta aula.</p>';
+          }
+        } catch (error) {
+          console.error("Error loading aula data:", error);
+          pageTitle.textContent = "Erro ao carregar Aula";
+          videoSection.innerHTML =
+            '<div class="video-placeholder-aula">Erro ao carregar vídeo.</div>';
+          questionSection.innerHTML =
+            '<p style="text-align: center; color: red;">Erro ao carregar perguntas.</p>';
+        }
+      }
+
+      // Call the fetch function when the page loads
+      if (aulaId) {
+        fetchAulaData(aulaId);
+      } else {
+        pageTitle.textContent = "ID da Aula não especificado";
+        videoSection.innerHTML =
+          '<div class="video-placeholder-aula">Selecione uma aula para começar.</div>';
+        questionSection.innerHTML = "";
+      }
+    </script>
+  </body>
+</html>

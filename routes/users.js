@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const pool = require("../config/database");
+const passport = require("passport");
+const { requireLogin } = require("./index"); // Importar o middleware requireLogin
 
 // Rota de registro
 router.post("/register", async (req, res) => {
@@ -27,45 +29,69 @@ router.post("/register", async (req, res) => {
 });
 
 // Rota de login
-router.post("/login", async (req, res) => {
-  try {
-    const { emailCpf, senha } = req.body;
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ sucesso: false, mensagem: info.message });
+    }
 
-    // Buscar usuário por email ou CPF
-    const [users] = await pool.execute(
-      "SELECT * FROM usuarios WHERE email = ? OR cpf = ?",
-      [emailCpf, emailCpf]
+    req.logIn(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      // Autenticação bem-sucedida, redirecionar ou enviar sucesso
+      return res.json({
+        sucesso: true,
+        mensagem: "Login bem-sucedido!",
+        redirectTo: "/",
+      });
+    });
+  })(req, res, next);
+});
+
+// Rota para atualizar o tema do usuário
+router.post("/theme", requireLogin, async (req, res) => {
+  try {
+    console.log("POST /api/users/theme accessed");
+    const userId = req.user.id; // Agora req.user deve estar populado
+    const { theme } = req.body;
+
+    console.log("User ID:", userId);
+    console.log("Theme received:", theme);
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ sucesso: false, mensagem: "Usuário não autenticado." });
+    }
+
+    if (!theme) {
+      return res
+        .status(400)
+        .json({ sucesso: false, mensagem: "Tema não fornecido." });
+    }
+
+    // Update the user's theme in the database
+    const [result] = await pool.execute(
+      "UPDATE usuarios SET theme = ? WHERE id = ?",
+      [theme, userId]
     );
 
-    if (users.length === 0) {
+    if (result.affectedRows === 0) {
       return res
-        .status(401)
-        .json({ sucesso: false, mensagem: "Usuário não encontrado" });
+        .status(404)
+        .json({ sucesso: false, mensagem: "Usuário não encontrado." });
     }
 
-    const user = users[0];
-
-    // Verificar senha
-    const senhaCorreta = await bcrypt.compare(senha, user.senha);
-
-    if (!senhaCorreta) {
-      return res
-        .status(401)
-        .json({ sucesso: false, mensagem: "Senha incorreta" });
-    }
-
-    // Remove a senha antes de enviar
-    delete user.senha;
-
-    // Aqui você pode adicionar a geração de token JWT se desejar
-    res.json({
-      sucesso: true,
-      usuario: user,
-      redirectTo: "/dashboard", // Adicionando redirecionamento para o dashboard
-    });
+    res.json({ sucesso: true, mensagem: "Tema atualizado com sucesso!" });
   } catch (error) {
-    console.error("Erro ao fazer login:", error);
-    res.status(500).json({ sucesso: false, mensagem: "Erro ao fazer login" });
+    console.error("Erro ao atualizar o tema do usuário:", error);
+    res
+      .status(500)
+      .json({ sucesso: false, mensagem: "Erro interno ao atualizar o tema." });
   }
 });
 

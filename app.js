@@ -17,26 +17,6 @@ const userRoutes = require("./routes/users");
 // Usar rotas
 app.use("/api/users", userRoutes);
 
-// Rotas de visualização
-app.get("/", (req, res) => {
-  res.render("home", { title: "Home", user: null });
-});
+// Outras configurações e middlewares aqui...
 
-app.get("/login", (req, res) => {
-  res.render("login", { title: "Login", user: null });
-});
-
-app.get("/cadastro", (req, res) => {
-  res.render("cadastro", { title: "Cadastro", user: null });
-});
-
-app.get("/dashboard", (req, res) => {
-  res.render("dashboard", { title: "Dashboard", user: null });
-});
-
-// Outras rotas aqui...
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+module.exports = app;

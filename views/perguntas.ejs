@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perguntas - MicroLearn</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      body {
+        background: #f8f9fa;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      .navbar {
+        background: #f3eaff;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-left,
+      .nav-center,
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+      .nav-logo {
+        height: 40px;
+        margin-right: 1rem;
+      }
+      .nav-link {
+        color: #222;
+        text-decoration: none;
+        margin: 0 1rem;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+      .nav-link:hover {
+        color: #7950f2;
+      }
+      .profile-icon {
+        font-size: 2rem;
+        color: #7950f2;
+        margin-left: 1rem;
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 6px;
+        padding: 0.2rem 0.5rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      }
+      .search-bar input {
+        border: none;
+        outline: none;
+        padding: 0.4rem;
+        font-size: 1rem;
+        background: transparent;
+      }
+      .search-button {
+        background: none;
+        border: none;
+        color: #7950f2;
+        font-size: 1.2rem;
+        cursor: pointer;
+      }
+      .page-title {
+        background: #f3eaff;
+        padding: 1.5rem 0 1rem 0;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #222;
+        margin-bottom: 1rem;
+      }
+      .comunidade-section {
+        background: #f3eaff;
+        margin: 0 0 2rem 0;
+        padding: 1rem 0 0.5rem 0;
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #222;
+        border-bottom: 3px solid #7950f2;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .duvidas-list {
+        background: #f8f9fa;
+        max-width: 600px;
+        margin: 0 auto;
+        min-height: 350px;
+        padding: 2rem 2rem 1rem 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(121, 80, 242, 0.05);
+        overflow-y: auto;
+      }
+      .duvida-item {
+        margin-bottom: 2rem;
+      }
+      .duvida-titulo {
+        font-weight: bold;
+        color: #7950f2;
+        margin-bottom: 0.5rem;
+      }
+      .respostas {
+        color: #444;
+        margin-left: 1rem;
+      }
+      /* Botão flutuante */
+      .fab-btn {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        background: #7950f2;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+        font-size: 2rem;
+        box-shadow: 0 2px 8px rgba(121, 80, 242, 0.2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        transition: background 0.2s;
+      }
+      .fab-btn:hover {
+        background: #5f3dc4;
+      }
+      /* Modal */
+      .modal-bg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-bg.active {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 16px rgba(121, 80, 242, 0.15);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+      }
+      .modal input,
+      .modal textarea {
+        width: 100%;
+        padding: 0.7rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+      .modal button {
+        background: #7950f2;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .modal button:hover {
+        background: #5f3dc4;
+      }
+      .modal .close-btn {
+        background: none;
+        color: #7950f2;
+        border: none;
+        font-size: 1.5rem;
+        position: absolute;
+        top: 1.2rem;
+        right: 1.5rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-left">
+        <img
+          src="/images/logo-microlearn.png"
+          alt="MicroLearn Logo"
+          class="nav-logo"
+        />
+        <a href="/" class="nav-link">HOME</a>
+        <a href="/perguntas" class="nav-link">Perguntas</a>
+      </div>
+      <div class="nav-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Pesquisar..." />
+          <button type="button" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="nav-right">
+        <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
+        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
+          <i class="fa-solid fa-circle-user"></i>
+        </a>
+      </div>
+    </nav>
+
+    <div class="page-title">Gráfico sequencia de dias</div>
+
+    <div class="comunidade-section">COMUNIDADE</div>
+    <div class="duvidas-list">
+      <div class="duvida-item">
+        <div class="duvida-titulo"></div>
+        <div class="respostas"></div>
+      </div>
+      <div class="duvida-item">
+        <div class="duvida-titulo"></div>
+        <div class="respostas"></div>
+      </div>
+      <div class="duvida-item">
+        <div class="duvida-titulo"></div>
+        <div class="respostas"></div>
+      </div>
+    </div>
+
+    <!-- Botão flutuante -->
+    <button class="fab-btn" id="openModalBtn" title="Adicionar pergunta">
+      <i class="fa fa-plus"></i>
+    </button>
+
+    <!-- Modal -->
+    <div class="modal-bg" id="modalBg">
+      <div class="modal" style="position: relative">
+        <button class="close-btn" id="closeModalBtn" title="Fechar">
+          &times;
+        </button>
+        <h2>Adicionar Pergunta</h2>
+        <textarea
+          id="perguntaInput"
+          rows="4"
+          placeholder="Digite sua pergunta..."
+        ></textarea>
+        <button id="enviarPerguntaBtn">Enviar</button>
+      </div>
+    </div>
+
+    <script>
+      const openModalBtn = document.getElementById("openModalBtn");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const modalBg = document.getElementById("modalBg");
+      const perguntaInput = document.getElementById("perguntaInput");
+      const enviarPerguntaBtn = document.getElementById("enviarPerguntaBtn");
+      const duvidasList = document.querySelector(".duvidas-list");
+
+      // Function to fetch and display questions
+      async function fetchAndDisplayQuestions() {
+        try {
+          const response = await fetch("/api/perguntas");
+          const questions = await response.json();
+
+          duvidasList.innerHTML = ""; // Clear existing content
+
+          if (questions.length === 0) {
+            duvidasList.innerHTML =
+              '<p style="text-align: center; color: #666;">Nenhuma pergunta ainda. Seja o primeiro a perguntar!</p>';
+            return;
+          }
+
+          questions.forEach((q) => {
+            const perguntaItem = document.createElement("div");
+            perguntaItem.classList.add("duvida-item");
+            perguntaItem.innerHTML = `
+              <div class="duvida-titulo">${q.texto}</div>
+              <div class="respostas">
+                ${q.respostas.length > 0 ? "<strong>Respostas:</strong>" : ""}
+                ${q.respostas.map((r) => `<p>- ${r.texto}</p>`).join("")}
+                ${
+                  q.respostas.length === 0
+                    ? "<p>Nenhuma resposta ainda.</p>"
+                    : ""
+                }
+              </div>
+              <!-- Optional: Add a form/button to add answers here -->
+            `;
+            duvidasList.appendChild(perguntaItem);
+          });
+        } catch (error) {
+          console.error("Error fetching questions:", error);
+          duvidasList.innerHTML =
+            '<p style="text-align: center; color: red;">Erro ao carregar perguntas.</p>';
+        }
+      }
+
+      // Fetch questions when the page loads
+      fetchAndDisplayQuestions();
+
+      openModalBtn.onclick = () => modalBg.classList.add("active");
+      closeModalBtn.onclick = () => modalBg.classList.remove("active");
+      modalBg.onclick = (e) => {
+        if (e.target === modalBg) modalBg.classList.remove("active");
+      };
+
+      enviarPerguntaBtn.onclick = async () => {
+        const perguntaTexto = perguntaInput.value.trim();
+        if (perguntaTexto === "") {
+          alert("Por favor, digite sua pergunta.");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/perguntas", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ texto: perguntaTexto }),
+          });
+
+          if (response.ok) {
+            alert("Pergunta enviada com sucesso!");
+            perguntaInput.value = ""; // Clear input
+            modalBg.classList.remove("active"); // Close modal
+            fetchAndDisplayQuestions(); // Refresh the list
+          } else {
+            const error = await response.json();
+            alert(
+              "Erro ao enviar pergunta: " + (error.error || "Erro desconhecido")
+            );
+          }
+        } catch (error) {
+          console.error("Error submitting question:", error);
+          alert("Erro ao enviar pergunta. Tente novamente.");
+        }
+      };
+    </script>
+  </body>
+</html>
