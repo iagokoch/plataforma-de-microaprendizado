@@ -5,6 +5,9 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const db = require("./database/connection"); // Importar a conexão com o banco
 const bcrypt = require("bcrypt"); // Para comparar senhas
+const dotenv = require("dotenv"); // Importar dotenv
+
+dotenv.config(); // Carregar variáveis de ambiente do .env
 
 // Importar rotas
 const indexRouter = require("./routes/index");

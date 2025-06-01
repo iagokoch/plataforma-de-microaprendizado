@@ -255,18 +255,14 @@
           <p style="margin-bottom: 1.5rem; color: #555">Escolhe seu tema</p>
 
           <div class="option-item">
-            <input
-              type="radio"
-              id="light-theme"
-              name="theme"
-              value="light"
-              checked
-            />
+            <input type="radio" id="light-theme" name="theme" value="light" <%=
+            user && user.theme !== 'dark' ? 'checked' : '' %> />
             <label for="light-theme">Tema claro</label>
           </div>
 
           <div class="option-item">
-            <input type="radio" id="dark-theme" name="theme" value="dark" />
+            <input type="radio" id="dark-theme" name="theme" value="dark" <%=
+            user && user.theme === 'dark' ? 'checked' : '' %>/>
             <label for="dark-theme">Tema escuro</label>
           </div>
 
@@ -293,7 +289,7 @@
           ).value;
 
           try {
-            const response = await fetch("/api/user/theme", {
+            const response = await fetch("/api/users/theme", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

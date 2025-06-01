@@ -68,5 +68,17 @@ router.get("/profile/theme", requireLogin, (req, res) => {
   }); // Passe o objeto de usuário real aqui
 });
 
+// Nova rota para a página de recuperação de senha
+router.get("/forgot-password", (req, res) => {
+  res.render("forgot-password", { title: "Recuperar Senha" });
+});
+
+// Nova rota para a página de redefinição de senha (com token)
+router.get("/reset-password/:token", (req, res) => {
+  const token = req.params.token;
+  // Aqui você pode opcionalmente verificar a validade do token antes de renderizar a página
+  res.render("reset-password", { title: "Redefinir Senha", token: token });
+});
+
 module.exports = router;
 module.exports.requireLogin = requireLogin;
