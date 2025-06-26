@@ -10,12 +10,18 @@ document.getElementById("cpf").addEventListener("input", function (e) {
 async function handleSubmit(event) {
   event.preventDefault();
 
+  const senha = document.getElementById("senha").value;
+  const confirmarSenha = document.getElementById("confirmarSenha").value;
+  if (senha !== confirmarSenha) {
+    alert("As senhas não coincidem!");
+    return;
+  }
   const formData = {
     nome: document.getElementById("nome").value,
     email: document.getElementById("email").value,
     cpf: document.getElementById("cpf").value.replace(/\D/g, ""),
-    senha: document.getElementById("senha").value,
-    anoEscolar: document.getElementById("anoEscolar").value,
+    senha: senha,
+    confirmarSenha: confirmarSenha,
   };
 
   try {

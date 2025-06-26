@@ -88,8 +88,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  const sql =
-    "SELECT id, nome, email, ano_escolar, theme FROM usuarios WHERE id = ?";
+  const sql = "SELECT id, nome, email, theme FROM usuarios WHERE id = ?";
   db.query(sql, [id], (err, results) => {
     if (err) {
       return done(err);

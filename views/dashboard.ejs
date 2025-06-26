@@ -14,7 +14,72 @@
   <body
     id="top"
     class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>"
+    data-user-logged="<%= user ? 'true' : 'false' %>"
   >
+    <div
+      id="login-popup"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 2rem 2.5rem;
+          border-radius: 10px;
+          box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+          text-align: center;
+          max-width: 90vw;
+          position: relative;
+        "
+      >
+        <button
+          id="close-login-popup"
+          style="
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: #7950f2;
+            cursor: pointer;
+          "
+        >
+          &times;
+        </button>
+        <h2 style="color: #7950f2; margin-bottom: 1rem">
+          Faça login para acessar a aula
+        </h2>
+        <p style="margin-bottom: 1.5rem">
+          Você precisa estar logado para ver o conteúdo da aula.
+        </p>
+        <a href="/login"
+          ><button
+            style="
+              background: #7950f2;
+              color: #fff;
+              border: none;
+              border-radius: 6px;
+              padding: 0.7rem 2rem;
+              font-size: 1.1rem;
+              cursor: pointer;
+            "
+          >
+            Ir para Login
+          </button></a
+        >
+      </div>
+    </div>
     <!-- Barra de navegação -->
     <nav class="navbar">
       <div class="nav-left">
@@ -57,31 +122,53 @@
       ></canvas>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script>
-        // Exemplo de dados fictícios para o gráfico
-        const ctx = document
-          .getElementById("sequenciaGrafico")
-          .getContext("2d");
-        new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
-            datasets: [
-              {
-                label: "Dias de estudo",
-                data: [1, 1, 0, 1, 1, 0, 1],
-                borderColor: "#7950f2",
-                backgroundColor: "rgba(121, 80, 242, 0.1)",
-                fill: true,
-                tension: 0.4,
-              },
-            ],
-          },
-          options: {
-            scales: {
-              y: { beginAtZero: true, stepSize: 1 },
+        async function carregarGraficoAcessos() {
+          const response = await fetch("/api/users/acessos/semana");
+          const acessos = await response.json();
+
+          // Montar array de datas dos últimos 7 dias
+          const dias = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+          const hoje = new Date();
+          let labels = [];
+          let data = [];
+          for (let i = 6; i >= 0; i--) {
+            const d = new Date(hoje);
+            d.setDate(hoje.getDate() - i);
+            labels.push(dias[d.getDay()]);
+            const dataStr = d.toISOString().slice(0, 10);
+            data.push(
+              acessos.some((a) => a.data_acesso.slice(0, 10) === dataStr)
+                ? 1
+                : 0
+            );
+          }
+
+          const ctx = document
+            .getElementById("sequenciaGrafico")
+            .getContext("2d");
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: "Dias de acesso",
+                  data: data,
+                  borderColor: "#7950f2",
+                  backgroundColor: "rgba(121, 80, 242, 0.1)",
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
             },
-          },
-        });
+            options: {
+              scales: {
+                y: { beginAtZero: true, stepSize: 1 },
+              },
+            },
+          });
+        }
+        carregarGraficoAcessos();
       </script>
       <% } %>
     </div>
@@ -506,6 +593,31 @@
       // Initial load: Fetch subjects and then aulas
       fetchAndDisplaySubjects();
       // Initial aula fetch is now triggered after subjects are displayed and 'Todas' is clicked
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const isLogged =
+          document.body.getAttribute("data-user-logged") === "true";
+        const btnsVerAula = document.querySelectorAll(".btn-ver-aula");
+        const loginPopup = document.getElementById("login-popup");
+
+        btnsVerAula.forEach((btn) => {
+          btn.addEventListener("click", function (e) {
+            if (!isLogged) {
+              e.preventDefault();
+              loginPopup.style.display = "flex";
+              document.body.style.overflow = "hidden";
+            }
+          });
+        });
+
+        const closeBtn = document.getElementById("close-login-popup");
+        if (closeBtn) {
+          closeBtn.addEventListener("click", function () {
+            loginPopup.style.display = "none";
+            document.body.style.overflow = "";
+          });
+        }
+      });
     </script>
 
     <!-- Footer -->

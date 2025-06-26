@@ -10,15 +10,21 @@ const nodemailer = require("nodemailer"); // Importar Nodemailer
 // Rota de registro
 router.post("/register", async (req, res) => {
   try {
-    const { nome, email, cpf, senha, anoEscolar } = req.body;
+    const { nome, email, cpf, senha, confirmarSenha } = req.body;
+
+    if (senha !== confirmarSenha) {
+      return res
+        .status(400)
+        .json({ sucesso: false, mensagem: "As senhas não coincidem." });
+    }
 
     // Hash da senha
     const hashedSenha = await bcrypt.hash(senha, 10);
 
     // Inserir usuário no banco
     const [result] = await pool.execute(
-      "INSERT INTO usuarios (nome, email, cpf, senha, ano_escolar) VALUES (?, ?, ?, ?, ?)",
-      [nome, email, cpf, hashedSenha, anoEscolar]
+      "INSERT INTO usuarios (nome, email, cpf, senha) VALUES (?, ?, ?, ?)",
+      [nome, email, cpf, hashedSenha]
     );
 
     res
@@ -40,9 +46,18 @@ router.post("/login", (req, res, next) => {
       return res.status(401).json({ sucesso: false, mensagem: info.message });
     }
 
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
         return next(err);
+      }
+      // Registrar acesso do usuário (um por dia)
+      try {
+        await pool.execute(
+          "INSERT INTO acessos (usuario_id, data_acesso) VALUES (?, CURDATE()) ON DUPLICATE KEY UPDATE data_acesso = data_acesso",
+          [user.id]
+        );
+      } catch (e) {
+        console.error("Erro ao registrar acesso:", e);
       }
       // Autenticação bem-sucedida, redirecionar ou enviar sucesso
       return res.json({
@@ -253,6 +268,21 @@ router.post("/reset-password", async (req, res) => {
       sucesso: false,
       mensagem: "Ocorreu um erro ao redefinir a senha.",
     });
+  }
+});
+
+// Rota para buscar acessos do usuário na última semana
+router.get("/acessos/semana", requireLogin, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const [rows] = await pool.execute(
+      `SELECT data_acesso FROM acessos WHERE usuario_id = ? AND data_acesso >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (error) {
+    console.error("Erro ao buscar acessos:", error);
+    res.status(500).json({ erro: "Erro ao buscar acessos" });
   }
 });
 

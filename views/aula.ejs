@@ -175,6 +175,59 @@
     </style>
   </head>
   <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+    <% if (!user) { %>
+    <div
+      id="login-popup"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 2rem 2.5rem;
+          border-radius: 10px;
+          box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+          text-align: center;
+          max-width: 90vw;
+        "
+      >
+        <h2 style="color: #7950f2; margin-bottom: 1rem">
+          Faça login para acessar a aula
+        </h2>
+        <p style="margin-bottom: 1.5rem">
+          Você precisa estar logado para ver o conteúdo da aula.
+        </p>
+        <a href="/login"
+          ><button
+            style="
+              background: #7950f2;
+              color: #fff;
+              border: none;
+              border-radius: 6px;
+              padding: 0.7rem 2rem;
+              font-size: 1.1rem;
+              cursor: pointer;
+            "
+          >
+            Ir para Login
+          </button></a
+        >
+      </div>
+    </div>
+    <script>
+      document.body.style.overflow = "hidden";
+    </script>
+    <% } %>
     <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-left">
