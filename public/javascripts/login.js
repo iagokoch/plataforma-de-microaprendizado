@@ -18,7 +18,7 @@ async function handleSubmit(event) {
     const data = await response.json();
 
     if (data.sucesso) {
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     } else {
       alert(data.mensagem || "Erro ao fazer login");
     }

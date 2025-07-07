@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Conteúdo</title>
+  <style>
+    body { background: #f3eaff; font-family: Arial, sans-serif; }
+    .admin-container { display: flex; min-height: 100vh; }
+    .sidebar {
+      flex: 0 0 180px; background: #f3eaff; border-radius: 12px 0 0 12px; padding: 2rem 1rem 1rem 1rem;
+      display: flex; flex-direction: column; gap: 1.2rem; align-items: stretch;
+    }
+    .sidebar-title { color: #7950f2; font-size: 2rem; font-weight: bold; margin-bottom: 2rem; text-align: center; letter-spacing: 2px; }
+    .sidebar-btn { background: #fff; color: #7950f2; border: none; border-radius: 6px; padding: 0.7rem 0.5rem; font-size: 1rem; margin-bottom: 0.5rem; cursor: pointer; text-align: left; transition: background 0.2s; }
+    .sidebar-btn.active, .sidebar-btn:hover { background: #7950f2; color: #fff; font-weight: bold; }
+    .sidebar-btn.logout { background: #ffb3b3; color: #fff; font-weight: bold; margin-top: 2rem; }
+    .sidebar-btn.logout:hover { background: #ff4c4c; }
+    .main-content { flex: 1; padding: 2.5rem; }
+    .conteudo-card {
+      background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(121, 80, 242, 0.10);
+      max-width: 700px; margin: 0 auto; padding: 2rem 2.5rem 2.5rem 2.5rem;
+    }
+    .conteudo-title { color: #7950f2; font-size: 1.3rem; font-weight: bold; margin-bottom: 1.2rem; }
+    .abas { display: flex; gap: 1rem; margin-bottom: 1.2rem; }
+    .aba-btn {
+      background: #e9d8ff; color: #7950f2; border: none; border-radius: 6px 6px 0 0; padding: 0.6rem 2.2rem; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    .aba-btn.active, .aba-btn:hover { background: #7950f2; color: #fff; }
+    .conteudo-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+    .search-input { flex: 1; padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+    .btn-novo { background: #7950f2; color: #fff; border: none; border-radius: 6px; padding: 0.7rem 1.5rem; font-size: 1rem; font-weight: bold; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; background: #fff; margin-top: 1rem; }
+    th, td { padding: 0.7rem 0.5rem; text-align: center; }
+    th { background: #f3eaff; color: #7950f2; font-weight: bold; }
+    tr:nth-child(even) { background: #f8f9fa; }
+    .acoes-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; margin: 0 0.2rem; }
+    .acoes-btn.edit { color: #7950f2; }
+    .acoes-btn.delete { color: #ff4c4c; }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <div class="sidebar">
+      <div class="sidebar-title">
+        <img src="/images/logo-microlearn.png" alt="Logo" style="height:40px;vertical-align:middle;margin-right:8px;">
+        ADMIN
+      </div>
+      <button class="sidebar-btn active">Conteúdo</button>
+      <button class="sidebar-btn" onclick="window.location.href='/usuarios'">Usuários</button>
+      <button class="sidebar-btn" onclick="window.location.href='/configuracoes'">Configurações</button>
+      <form action="/logout" method="GET" style="margin:0;">
+        <button class="sidebar-btn logout" type="submit">Sair da Conta</button>
+      </form>
+    </div>
+    <div class="main-content">
+      <div class="conteudo-card">
+        <div class="conteudo-title">Gerenciamento de conteúdo</div>
+        <div class="abas">
+          <button class="aba-btn active">Vídeos</button>
+          <button class="aba-btn">Perguntas</button>
+        </div>
+        <div class="conteudo-bar">
+          <input class="search-input" type="text" placeholder="Pesquisar vídeos" />
+          <button class="btn-novo">Novo</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Matéria</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (aulas.length === 0) { %>
+              <tr>
+                <td colspan="4" style="text-align:center; color:#888; font-style:italic;">Nenhum vídeo cadastrado ainda.</td>
+              </tr>
+            <% } else { %>
+              <% aulas.forEach(function(aula) { %>
+                <tr>
+                  <td><%= aula.id %></td>
+                  <td><%= aula.titulo %></td>
+                  <td><%= aula.materia %></td>
+                  <td>
+                    <button class="acoes-btn edit" title="Editar">✏️</button>
+                    <button class="acoes-btn delete" title="Excluir">❌</button>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

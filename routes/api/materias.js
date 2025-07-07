@@ -4,14 +4,12 @@ const router = express.Router();
 // Importar a conexão com o banco de dados
 const db = require("../../database/connection");
 
-// GET list of all subjects
+// Rota para listar todas as matérias
 router.get("/", (req, res) => {
-  const sql = "SELECT id, nome FROM materias ORDER BY nome";
-
-  db.query(sql, (err, results) => {
+  db.query("SELECT id, nome FROM materias", (err, results) => {
     if (err) {
-      console.error("Error fetching subjects:", err);
-      return res.status(500).json({ error: "Error fetching subjects" });
+      console.error("Erro ao buscar matérias:", err);
+      return res.status(500).json({ erro: "Erro ao buscar matérias" });
     }
     res.json(results);
   });

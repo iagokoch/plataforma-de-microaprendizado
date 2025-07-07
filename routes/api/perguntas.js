@@ -10,10 +10,13 @@ router.get("/", (req, res) => {
         p.id AS pergunta_id,
         p.texto AS pergunta_texto,
         p.data_criacao AS pergunta_data,
+        u.nome AS autor_nome,
+        u.foto_perfil AS autor_foto,
         r.id AS resposta_id,
         r.texto AS resposta_texto,
         r.data_criacao AS resposta_data
     FROM perguntas p
+    LEFT JOIN usuarios u ON p.usuario_id = u.id
     LEFT JOIN respostas r ON p.id = r.pergunta_id
     ORDER BY p.data_criacao DESC, r.data_criacao ASC
   `;
@@ -31,6 +34,8 @@ router.get("/", (req, res) => {
           id: row.pergunta_id,
           texto: row.pergunta_texto,
           data_criacao: row.pergunta_data,
+          autor_nome: row.autor_nome,
+          autor_foto: row.autor_foto,
           respostas: [],
         };
       }
@@ -38,7 +43,7 @@ router.get("/", (req, res) => {
         questions[row.pergunta_id].respostas.push({
           id: row.resposta_id,
           texto: row.resposta_texto,
-          data_criacao: row.data_criacao,
+          data_criacao: row.resposta_data,
         });
       }
     });
@@ -88,6 +93,29 @@ router.post("/:perguntaId/respostas", (req, res) => {
       texto,
       usuario_id,
       data_criacao: new Date(),
+    });
+  });
+});
+
+// Rota para deletar uma pergunta (apenas pelo autor)
+router.delete('/:id', (req, res) => {
+  const perguntaId = req.params.id;
+  const usuarioId = req.body.usuario_id;
+  if (!usuarioId) {
+    return res.status(401).json({ error: 'Usuário não autenticado' });
+  }
+  // Verifica se a pergunta pertence ao usuário
+  const sqlCheck = 'SELECT usuario_id FROM perguntas WHERE id = ?';
+  db.query(sqlCheck, [perguntaId], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erro ao verificar pergunta' });
+    if (!results.length || results[0].usuario_id != usuarioId) {
+      return res.status(403).json({ error: 'Você não tem permissão para excluir esta pergunta' });
+    }
+    // Exclui a pergunta
+    const sqlDelete = 'DELETE FROM perguntas WHERE id = ?';
+    db.query(sqlDelete, [perguntaId], (err2) => {
+      if (err2) return res.status(500).json({ error: 'Erro ao excluir pergunta' });
+      res.json({ sucesso: true });
     });
   });
 });

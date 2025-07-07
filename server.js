@@ -27,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 // Configurar middleware de sessão
 app.use(
   session({
+    name: 'user.sid',
     secret: "seu_segredo_muito_secreto", // Substitua por uma string aleatória forte
     resave: false,
     saveUninitialized: false,
@@ -88,7 +89,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-  const sql = "SELECT id, nome, email, theme FROM usuarios WHERE id = ?";
+  const sql = "SELECT id, nome, email, theme, foto_perfil FROM usuarios WHERE id = ?";
   db.query(sql, [id], (err, results) => {
     if (err) {
       return done(err);

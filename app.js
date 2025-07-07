@@ -13,9 +13,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Importar rotas
 const userRoutes = require("./routes/users");
+const perguntasRoutes = require("./routes/api/perguntas");
+const materiasRoutes = require("./routes/api/materias");
 
 // Usar rotas
 app.use("/api/users", userRoutes);
+app.use("/api/perguntas", perguntasRoutes);
+app.use("/api/materias", materiasRoutes);
 
 // Outras configurações e middlewares aqui...
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MicroLearn - Dashboard</title>
     <link rel="stylesheet" href="/stylesheets/dashboard.css" />
+    <link rel="icon" href="/images/logo-microlearn.png">
     <!-- Font Awesome -->
     <link
       rel="stylesheet"
@@ -88,7 +89,7 @@
           alt="MicroLearn Logo"
           class="nav-logo"
         />
-        <a href="#top" class="nav-link">HOME</a>
+        <a href="/" class="nav-link">HOME</a>
         <a href="/perguntas" class="nav-link">Perguntas</a>
       </div>
       <div class="nav-center">
@@ -101,9 +102,15 @@
       </div>
       <div class="nav-right">
         <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
-        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
-          <i class="fa-solid fa-circle-user"></i>
-        </a>
+        <% if (user && user.foto_perfil) { %>
+          <a href="/profile" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <img src="<%= user.foto_perfil %>" alt="Foto de Perfil" style="width:40px;height:40px;object-fit:cover;border-radius:50%;" />
+          </a>
+        <% } else { %>
+          <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
+            <i class="fa-solid fa-circle-user"></i>
+          </a>
+        <% } %>
       </div>
     </nav>
 
@@ -114,61 +121,37 @@
         Faça Login para ter acesso ao gráfico
       </p>
       <% } else { %>
-      <canvas
-        id="sequenciaGrafico"
-        width="400"
-        height="150"
-        style="margin-top: 1rem"
-      ></canvas>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <p id="sequenciaDias" style="color: #7950f2; font-size: 1.2rem; margin-top: 1rem"></p>
       <script>
-        async function carregarGraficoAcessos() {
+        async function carregarSequenciaDias() {
           const response = await fetch("/api/users/acessos/semana");
           const acessos = await response.json();
-
-          // Montar array de datas dos últimos 7 dias
-          const dias = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-          const hoje = new Date();
-          let labels = [];
-          let data = [];
-          for (let i = 6; i >= 0; i--) {
-            const d = new Date(hoje);
-            d.setDate(hoje.getDate() - i);
-            labels.push(dias[d.getDay()]);
-            const dataStr = d.toISOString().slice(0, 10);
-            data.push(
-              acessos.some((a) => a.data_acesso.slice(0, 10) === dataStr)
-                ? 1
-                : 0
-            );
+          console.log('Acessos recebidos:', acessos);
+          // Ordena as datas e calcula a sequência
+          const datas = acessos.map(a => a.data_acesso.slice(0, 10)).sort();
+          let sequencia = 0;
+          let hoje = new Date();
+          for (let i = datas.length - 1; i >= 0; i--) {
+            const dataAcesso = new Date(datas[i]);
+            if (
+              dataAcesso.getFullYear() === hoje.getFullYear() &&
+              dataAcesso.getMonth() === hoje.getMonth() &&
+              dataAcesso.getDate() === hoje.getDate()
+            ) {
+              sequencia++;
+              hoje.setDate(hoje.getDate() - 1);
+            } else {
+              break;
+            }
           }
-
-          const ctx = document
-            .getElementById("sequenciaGrafico")
-            .getContext("2d");
-          new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  label: "Dias de acesso",
-                  data: data,
-                  borderColor: "#7950f2",
-                  backgroundColor: "rgba(121, 80, 242, 0.1)",
-                  fill: true,
-                  tension: 0.4,
-                },
-              ],
-            },
-            options: {
-              scales: {
-                y: { beginAtZero: true, stepSize: 1 },
-              },
-            },
-          });
+          document.getElementById("sequenciaDias").innerText =
+            sequencia > 1
+              ? `Você acessou por ${sequencia} dias em sequência!`
+              : sequencia === 1
+              ? "Você acessou hoje!"
+              : "Entre 3 dias Seguidos para iniciar a sequência";
         }
-        carregarGraficoAcessos();
+        carregarSequenciaDias();
       </script>
       <% } %>
     </div>
@@ -180,445 +163,31 @@
       <a href="/lingua-portuguesa" class="subject-link">Língua Portuguesa</a>
       <a href="/geografia" class="subject-link">Geografia</a>
       <a href="/filosofia" class="subject-link">Filosofia</a>
-      <a href="/mais" class="subject-link">Mais</a>
+      <a href="/historia" class="subject-link">História</a>
     </div>
 
     <!-- Grid de vídeos -->
     <div class="video-grid">
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
-      <div class="video-card">
-        <div class="video-placeholder">Vídeo</div>
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            padding: 1rem;
-            background: white;
-            border-top: 1px solid #eee;
-          "
-        >
-          <a href="/aula/1" style="text-decoration: none">
-            <button
-              class="btn-ver-aula"
-              style="
-                background: #7950f2;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                padding: 0.5rem 1.2rem;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: background 0.2s;
-              "
-            >
-              Ver Aula
-            </button>
-          </a>
-        </div>
-      </div>
+      <% if (aulas && aulas.length > 0) { %>
+        <% aulas.forEach(function(aula) { %>
+          <div class="video-card">
+            <div class="video-embed" style="background:#e9d8ff;padding:0.5rem 0.5rem 0 0.5rem;border-radius:12px 12px 0 0;">
+              <iframe width="100%" height="220" src="<%= aula.video_url %>" frameborder="0" allowfullscreen style="border-radius:12px 12px 0 0;"></iframe>
+            </div>
+            <div style="padding:0.7rem 0;text-align:center;background:white;border-radius:0 0 12px 12px;">
+              <div style="font-size:1.1rem;color:#7950f2;font-weight:bold;"><%= aula.titulo %></div>
+              <a href="/aula/<%= aula.id %>" style="text-decoration: none">
+                <button class="btn-ver-aula" style="background: #7950f2; color: white; border: none; border-radius: 6px; padding: 0.5rem 1.2rem; font-size: 1rem; cursor: pointer; transition: background 0.2s; margin-top:0.5rem;">Ver Aula</button>
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div style="color:#888;text-align:center;width:100%;font-style:italic;">Nenhuma aula disponível.</div>
+      <% } %>
     </div>
 
-    <script>
-      const subjectsMenu = document.querySelector(".subjects-menu");
-      const videoGrid = document.querySelector(".video-grid");
-
-      // Static placeholder video card HTML
-      const placeholderVideoCardHTML = `
-        <div class="video-card">
-          <div class="video-placeholder">Vídeo</div>
-          <div
-            style="
-              display: flex;
-              justify-content: center;
-              padding: 1rem;
-              background: white;
-              border-top: 1px solid #eee;
-            "
-          >
-            <a href="/aula/1" style="text-decoration: none">
-              <button
-                class="btn-ver-aula"
-                style="
-                  background: #7950f2;
-                  color: white;
-                  border: none;
-                  border-radius: 6px;
-                  padding: 0.5rem 1.2rem;
-                  font-size: 1rem;
-                  cursor: pointer;
-                  transition: background 0.2s;
-                "
-              >
-                Ver Aula
-              </button>
-            </a>
-          </div>
-        </div>
-      `;
-
-      // Function to fetch and display subjects
-      async function fetchAndDisplaySubjects() {
-        try {
-          const response = "/api/materias";
-          const subjects = await response.json();
-
-          subjectsMenu.innerHTML = ""; // Clear existing subject links
-
-          // Add an 'All' or 'Aleatório' option
-          const allLink = document.createElement("a");
-          allLink.href = "#all";
-          allLink.classList.add("subject-link");
-          allLink.textContent = "Todas"; // Or 'Aleatório'
-          allLink.dataset.subjectId = ""; // Use empty string for all/random
-          subjectsMenu.appendChild(allLink);
-
-          subjects.forEach((subject) => {
-            const subjectLink = document.createElement("a");
-            subjectLink.href = `#${subject.nome
-              .toLowerCase()
-              .replace(/\s+/g, "-")}`; // Use hash for filtering
-            subjectLink.classList.add("subject-link");
-            subjectLink.textContent = subject.nome;
-            subjectLink.dataset.subjectId = subject.id; // Store subject ID
-            subjectsMenu.appendChild(subjectLink);
-          });
-
-          // Automatically click the 'Todas' link on initial load
-          subjectsMenu.querySelector("a.subject-link").click();
-        } catch (error) {
-          console.error("Error fetching subjects:", error);
-          // If fetching subjects fails, just display the placeholder videos
-          displayPlaceholderVideos(8); // Display a few placeholder videos if subjects can't be fetched
-        }
-      }
-
-      // Function to display a specific number of placeholder video cards
-      function displayPlaceholderVideos(count) {
-        videoGrid.innerHTML = ""; // Clear existing content
-        for (let i = 0; i < count; i++) {
-          videoGrid.innerHTML += placeholderVideoCardHTML;
-        }
-      }
-
-      // Function to fetch and display aulas
-      async function fetchAndDisplayAulas(materiaId = null) {
-        try {
-          let url = "/api/aulas";
-          if (materiaId) {
-            url = `/api/aulas?materia_id=${materiaId}`;
-          }
-
-          const response = await fetch(url);
-          const aulas = await response.json();
-
-          videoGrid.innerHTML = ""; // Clear existing video cards
-
-          if (aulas.length === 0) {
-            // If no aulas are returned, display placeholder videos
-            displayPlaceholderVideos(8); // Display a few placeholders
-            // videoGrid.innerHTML = '<p style="text-align: center; width: 100%; color: #666;">Nenhuma aula encontrada para esta matéria.</p>';
-            return;
-          }
-
-          // Render fetched aulas
-          aulas.forEach((aula) => {
-            const videoCard = document.createElement("div");
-            videoCard.classList.add("video-card");
-            videoCard.innerHTML = `
-              <div class="video-placeholder">${aula.titulo || "Vídeo"}</div>
-              <div
-                style="
-                  display: flex;
-                  justify-content: center;
-                  padding: 1rem;
-                  background: white;
-                  border-top: 1px solid #eee;
-                "
-              >
-                <a href="/aula/${aula.id}" style="text-decoration: none">
-                  <button
-                    class="btn-ver-aula"
-                    style="
-                      background: #7950f2;
-                      color: white;
-                      border: none;
-                      border-radius: 6px;
-                      padding: 0.5rem 1.2rem;
-                      font-size: 1rem;
-                      cursor: pointer;
-                      transition: background 0.2s;
-                    "
-                  >
-                    Ver Aula
-                  </button>
-                </a>
-              </div>
-            `;
-            videoGrid.appendChild(videoCard);
-          });
-        } catch (error) {
-          console.error("Error fetching aulas:", error);
-          // If fetching aulas fails, display placeholder videos
-          displayPlaceholderVideos(8); // Display a few placeholders
-          // videoGrid.innerHTML = '<p style="text-align: center; width: 100%; color: red;">Erro ao carregar aulas.</p>';
-        }
-      }
-
-      // Event listener for subject links (using event delegation)
-      subjectsMenu.addEventListener("click", (event) => {
-        event.preventDefault(); // Prevent default link behavior
-        const target = event.target;
-        if (target.classList.contains("subject-link")) {
-          // Remove active class from all links
-          subjectsMenu.querySelectorAll(".subject-link").forEach((link) => {
-            link.classList.remove("active");
-          });
-          // Add active class to the clicked link
-          target.classList.add("active");
-
-          const subjectId = target.dataset.subjectId;
-          fetchAndDisplayAulas(subjectId || null); // Fetch aulas for the clicked subject (null for 'Todas')
-        }
-      });
-
-      // Initial load: Fetch subjects and then aulas
-      fetchAndDisplaySubjects();
-      // Initial aula fetch is now triggered after subjects are displayed and 'Todas' is clicked
-
-      document.addEventListener("DOMContentLoaded", function () {
-        const isLogged =
-          document.body.getAttribute("data-user-logged") === "true";
-        const btnsVerAula = document.querySelectorAll(".btn-ver-aula");
-        const loginPopup = document.getElementById("login-popup");
-
-        btnsVerAula.forEach((btn) => {
-          btn.addEventListener("click", function (e) {
-            if (!isLogged) {
-              e.preventDefault();
-              loginPopup.style.display = "flex";
-              document.body.style.overflow = "hidden";
-            }
-          });
-        });
-
-        const closeBtn = document.getElementById("close-login-popup");
-        if (closeBtn) {
-          closeBtn.addEventListener("click", function () {
-            loginPopup.style.display = "none";
-            document.body.style.overflow = "";
-          });
-        }
-      });
-    </script>
+    <script src="/javascripts/dashboard.js"></script>
 
     <!-- Footer -->
     <footer class="footer">

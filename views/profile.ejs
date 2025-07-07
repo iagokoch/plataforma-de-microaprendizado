@@ -215,7 +215,11 @@
       }
     </style>
   </head>
-  <body class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>">
+  <body
+    id="top"
+    class="<%= user && user.theme === 'dark' ? 'dark-mode' : '' %>"
+    data-user-logged="<%= user ? 'true' : 'false' %>"
+  >
     <!-- Navbar -->
     <nav class="navbar">
       <div class="nav-left">
@@ -237,9 +241,15 @@
       </div>
       <div class="nav-right">
         <a href="/minhas-tarefas" class="nav-link">Minhas Tarefas</a>
-        <a href="<%= user ? '/profile' : '/login' %>" class="profile-icon">
-          <i class="fa-solid fa-circle-user"></i>
-        </a>
+        <% if (user && user.foto_perfil) { %>
+          <a href="/profile" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+            <img src="<%= user.foto_perfil %>" alt="Foto de Perfil" style="width:40px;height:40px;object-fit:cover;border-radius:50%;" />
+          </a>
+        <% } else { %>
+          <a href="/profile" class="profile-icon">
+            <i class="fa-solid fa-circle-user"></i>
+          </a>
+        <% } %>
       </div>
     </nav>
 
@@ -252,20 +262,25 @@
         <a href="/profile" class="sidebar-link active">Dados Pessoais</a>
         <a href="/profile/security" class="sidebar-link">Segurança</a>
         <a href="/profile/theme" class="sidebar-link">Tema</a>
-        <a href="#" class="sidebar-link">Meu Progresso</a>
-        <a href="#" class="sidebar-link logout">Sair da Conta</a>
+        <a href="#" class="sidebar-link" id="progresso-link">Meu Progresso</a>
+        <a href="/api/users/logout" class="sidebar-link logout" id="logout-link">Sair da Conta</a>
       </div>
 
       <!-- Conteúdo Principal do Perfil -->
-      <div class="profile-content">
+      <div class="profile-content" id="dados-pessoais-content">
         <h3>Dados Pessoais</h3>
 
-        <form class="profile-form">
+        <form class="profile-form" id="profile-form" enctype="multipart/form-data">
           <div class="profile-picture-upload">
-            <div class="profile-picture-placeholder">
-              <i class="fa-solid fa-user"></i>
+            <div class="profile-picture-placeholder" id="profile-picture-preview">
+              <% if (user && user.foto_perfil) { %>
+                <img src="<%= user.foto_perfil %>" alt="Foto de Perfil" style="width:80px;height:80px;border-radius:50%;object-fit:cover;" />
+              <% } else { %>
+                <i class="fa-solid fa-user"></i>
+              <% } %>
             </div>
-            <button type="button" class="btn-primary">Alterar Foto</button>
+            <input type="file" id="foto-perfil-input" name="foto" accept="image/*" style="display:none;" />
+            <button type="button" class="btn-primary" id="alterar-foto-btn">Alterar Foto</button>
           </div>
 
           <div class="form-group">
@@ -303,12 +318,131 @@
 
           <div class="form-actions">
             <button type="button" class="btn-secondary">Cancelar</button>
-            <button type="submit" class="btn-primary">Salvar</button>
+            <button type="submit" class="btn-primary" id="salvar-perfil-btn">Salvar</button>
           </div>
         </form>
-
-        <!-- Outras seções como Segurança, Tema, Progresso podem ser exibidas aqui com base na navegação da sidebar -->
       </div>
+      <div class="profile-content" id="progresso-content" style="display:none;">
+        <div class="page-title">Meu progresso</div>
+        <div class="progresso-box" style="background: var(--progresso-bg, #f8f0fc); border-radius: 16px; padding: 2rem; max-width: 400px; margin: 0 auto; box-shadow: 0 2px 8px rgba(121,80,242,0.08);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+            <div>
+              <div style="color: #7950f2; font-size: 1.2rem; font-weight: bold;">Vídeos Assistidos</div>
+              <div id="videos-assistidos" style="font-size: 2.2rem; color: #7950f2;">0</div>
+            </div>
+            <div>
+              <div style="color: #7950f2; font-size: 1.2rem; font-weight: bold;">Tarefas concluídas</div>
+              <div id="tarefas-concluidas" style="font-size: 2.2rem; color: #7950f2;">0</div>
+            </div>
+          </div>
+          <div id="progresso-materias"></div>
+          <button id="voltar-progresso" style="margin-top: 2rem; background: #7950f2; color: white; border: none; border-radius: 6px; padding: 0.5rem 2rem; font-size: 1rem; cursor: pointer;">Voltar</button>
+        </div>
+      </div>
+      <script>
+        // Alternar abas do perfil
+        function mostrarAba(idAba, linkSidebar) {
+          // Esconde todas as abas
+          document.querySelectorAll('.profile-content').forEach(div => div.style.display = 'none');
+          // Remove active de todos os links
+          document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+          // Mostra a aba desejada
+          document.getElementById(idAba).style.display = '';
+          // Marca o link como ativo
+          linkSidebar.classList.add('active');
+          // Tema escuro para progresso
+          if(idAba === 'progresso-content') {
+            if(document.body.classList.contains('dark-mode')) {
+              document.querySelector('.progresso-box').style.setProperty('background', '#222');
+              document.querySelector('.progresso-box').style.setProperty('color', '#f0f0f0');
+            } else {
+              document.querySelector('.progresso-box').style.setProperty('background', '#f8f0fc');
+              document.querySelector('.progresso-box').style.setProperty('color', '#222');
+            }
+          }
+        }
+        // Sidebar links
+        if (window.location.pathname === '/profile') {
+          document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+              if(this.id === 'progresso-link') {
+                e.preventDefault();
+                mostrarAba('progresso-content', this);
+                carregarProgresso();
+              } else if(this.textContent.includes('Dados Pessoais')) {
+                e.preventDefault();
+                mostrarAba('dados-pessoais-content', this);
+              }
+              // Segurança e Tema deixam o comportamento padrão (recarregam a página)
+            });
+          });
+          // Botão voltar do progresso
+          document.getElementById('voltar-progresso').addEventListener('click', function() {
+            const dadosPessoaisLink = Array.from(document.querySelectorAll('.sidebar-link')).find(l => l.textContent.includes('Dados Pessoais'));
+            mostrarAba('dados-pessoais-content', dadosPessoaisLink);
+          });
+        }
+        // Buscar progresso do usuário
+        async function carregarProgresso() {
+          const response = await fetch('/api/users/progresso');
+          const data = await response.json();
+          document.getElementById('videos-assistidos').innerText = data.videosAssistidos;
+          document.getElementById('tarefas-concluidas').innerText = data.tarefasConcluidas;
+          let html = '';
+          data.progressoMaterias.forEach(m => {
+            html += `<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;'>
+              <span style='color:#7950f2;font-weight:bold;'>${m.materia}</span>
+              <span style='color:#7950f2;font-size:1.2rem;'>${m.porcentagem}%</span>
+            </div>`;
+          });
+          document.getElementById('progresso-materias').innerHTML = html;
+        }
+        // Abrir aba de progresso automaticamente se vier de ?aba=progresso
+        if (window.location.search.includes('aba=progresso')) {
+          const progressoLink = document.getElementById('progresso-link');
+          mostrarAba('progresso-content', progressoLink);
+          carregarProgresso();
+        }
+        // Preview da foto ao selecionar
+        document.getElementById('alterar-foto-btn').addEventListener('click', function() {
+          document.getElementById('foto-perfil-input').click();
+        });
+        document.getElementById('foto-perfil-input').addEventListener('change', function() {
+          const file = this.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.getElementById('profile-picture-preview');
+            preview.innerHTML = `<img src='${e.target.result}' alt='Foto de Perfil' style='width:80px;height:80px;border-radius:50%;object-fit:cover;' />`;
+          };
+          reader.readAsDataURL(file);
+        });
+        // Envio do formulário completo (dados + foto)
+        document.getElementById('profile-form').addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const form = e.target;
+          const formData = new FormData(form);
+          const btn = document.getElementById('salvar-perfil-btn');
+          btn.disabled = true;
+          btn.innerText = 'Salvando...';
+          try {
+            const response = await fetch('/api/users/atualizar-perfil', {
+              method: 'POST',
+              body: formData
+            });
+            const data = await response.json();
+            if (data.sucesso) {
+              window.location.reload();
+            } else {
+              alert(data.mensagem || 'Erro ao salvar perfil.');
+            }
+          } catch (e) {
+            alert('Erro ao conectar com o servidor.');
+          }
+          btn.disabled = false;
+          btn.innerText = 'Salvar';
+        });
+      </script>
     </div>
 
     <!-- Optional: Add a footer if needed -->

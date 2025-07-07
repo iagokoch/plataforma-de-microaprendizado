@@ -6,6 +6,20 @@ const passport = require("passport");
 const { requireLogin } = require("./index"); // Importar o middleware requireLogin
 const crypto = require("crypto");
 const nodemailer = require("nodemailer"); // Importar Nodemailer
+const multer = require('multer');
+const path = require('path');
+
+// Configuração do multer para salvar em public/uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../public/uploads'));
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    cb(null, 'user_' + req.user.id + '_' + Date.now() + ext);
+  }
+});
+const upload = multer({ storage });
 
 // Rota de registro
 router.post("/register", async (req, res) => {
@@ -283,6 +297,97 @@ router.get("/acessos/semana", requireLogin, async (req, res) => {
   } catch (error) {
     console.error("Erro ao buscar acessos:", error);
     res.status(500).json({ erro: "Erro ao buscar acessos" });
+  }
+});
+
+// Rota para buscar progresso do usuário
+router.get("/progresso", requireLogin, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Total de vídeos assistidos
+    const [aulasAssistidas] = await pool.execute(
+      `SELECT COUNT(*) as total FROM aulas_assistidas WHERE usuario_id = ?`,
+      [userId]
+    );
+    // Total de tarefas concluídas
+    const [tarefasConcluidas] = await pool.execute(
+      `SELECT COUNT(*) as total FROM tarefas WHERE usuario_id = ? AND concluida = TRUE`,
+      [userId]
+    );
+    // Progresso por matéria
+    const [materias] = await pool.execute(`SELECT id, nome FROM materias`);
+    let progressoMaterias = [];
+    for (const materia of materias) {
+      // Total de aulas na matéria
+      const [totalAulas] = await pool.execute(
+        `SELECT COUNT(*) as total FROM aulas WHERE materia_id = ?`,
+        [materia.id]
+      );
+      // Aulas assistidas na matéria
+      const [assistidas] = await pool.execute(
+        `SELECT COUNT(*) as total FROM aulas_assistidas aa
+         JOIN aulas a ON aa.aula_id = a.id
+         WHERE aa.usuario_id = ? AND a.materia_id = ?`,
+        [userId, materia.id]
+      );
+      progressoMaterias.push({
+        materia: materia.nome,
+        porcentagem: totalAulas[0].total > 0 ? Math.round((assistidas[0].total / totalAulas[0].total) * 100) : 0
+      });
+    }
+    res.json({
+      videosAssistidos: aulasAssistidas[0].total,
+      tarefasConcluidas: tarefasConcluidas[0].total,
+      progressoMaterias
+    });
+  } catch (error) {
+    console.error("Erro ao buscar progresso do usuário:", error);
+    res.status(500).json({ erro: "Erro ao buscar progresso" });
+  }
+});
+
+// Rota para logout
+router.get('/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { return res.status(500).send('Erro ao sair da conta'); }
+    req.session.destroy(() => {
+      res.redirect('/login');
+    });
+  });
+});
+
+// Rota para upload de foto de perfil
+router.post('/upload-foto', requireLogin, upload.single('foto'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ sucesso: false, mensagem: 'Nenhum arquivo enviado.' });
+    }
+    const fotoPath = '/uploads/' + req.file.filename;
+    await pool.execute('UPDATE usuarios SET foto_perfil = ? WHERE id = ?', [fotoPath, req.user.id]);
+    res.json({ sucesso: true, foto_perfil: fotoPath });
+  } catch (error) {
+    console.error('Erro ao fazer upload da foto:', error);
+    res.status(500).json({ sucesso: false, mensagem: 'Erro ao fazer upload da foto.' });
+  }
+});
+
+// Rota para atualizar dados pessoais e foto de perfil
+router.post('/atualizar-perfil', requireLogin, upload.single('foto'), async (req, res) => {
+  try {
+    const { nome, email, telefone } = req.body;
+    let query = 'UPDATE usuarios SET nome = ?, email = ?, telefone = ?';
+    let params = [nome, email, telefone, req.user.id];
+    if (req.file) {
+      query = 'UPDATE usuarios SET nome = ?, email = ?, telefone = ?, foto_perfil = ? WHERE id = ?';
+      params = [nome, email, telefone, '/uploads/' + req.file.filename, req.user.id];
+    } else {
+      query += ' WHERE id = ?';
+    }
+    await pool.execute(query, params);
+    res.json({ sucesso: true });
+  } catch (error) {
+    console.error('Erro ao atualizar perfil:', error);
+    res.status(500).json({ sucesso: false, mensagem: 'Erro ao atualizar perfil.' });
   }
 });
 
