@@ -1,15 +1,13 @@
 const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
+const { database, ...serverConfig } = require('./config/db-config');
 
 async function setupDatabase() {
   try {
     // Conectar sem especificar database para poder criar
-    const connection = await mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: ''
-    });
+    // (o nome do banco vem do próprio microlearn.sql: CREATE DATABASE microlearn)
+    const connection = await mysql.createConnection(serverConfig);
 
     console.log('Conectado ao MySQL...');
 

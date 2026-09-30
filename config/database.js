@@ -1,10 +1,8 @@
 const mysql = require("mysql2/promise");
+const dbConfig = require("./db-config");
 
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "", // Senha padrão do XAMPP é vazia
-  database: "microlearn",
+  ...dbConfig,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

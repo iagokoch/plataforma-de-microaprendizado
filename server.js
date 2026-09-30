@@ -1,3 +1,5 @@
+require("dotenv").config(); // Carregar o .env ANTES de qualquer módulo que leia process.env
+
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
@@ -5,9 +7,11 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const db = require("./database/connection"); // Importar a conexão com o banco
 const bcrypt = require("bcrypt"); // Para comparar senhas
-const dotenv = require("dotenv"); // Importar dotenv
 
-dotenv.config(); // Carregar variáveis de ambiente do .env
+if (!process.env.SESSION_SECRET) {
+  console.error("Defina SESSION_SECRET no arquivo .env (veja .env.example).");
+  process.exit(1);
+}
 
 // Importar rotas
 const indexRouter = require("./routes/index");
@@ -28,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     name: 'user.sid',
-    secret: "seu_segredo_muito_secreto", // Substitua por uma string aleatória forte
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 horas

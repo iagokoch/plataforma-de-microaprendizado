@@ -185,7 +185,8 @@ router.post("/forgot-password-request", async (req, res) => {
       },
     });
 
-    const resetLink = `http://localhost:3001/reset-password/${token}`; // Substitua localhost:3001 pela URL do seu site em produção
+    const appUrl = process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const resetLink = `${appUrl}/reset-password/${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER, // Remetente

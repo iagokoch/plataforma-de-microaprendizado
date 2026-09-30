@@ -1,18 +1,20 @@
 {
   "name": "plataforma-de-microaprendizado",
   "version": "1.0.0",
-  "description": "",
+  "description": "Plataforma de microaprendizado com vídeo-aulas, quiz, fórum de dúvidas e acompanhamento de progresso (Node.js, Express, EJS e MySQL).",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "admin": "node adminServer.js",
+    "db:setup": "node setup-database.js",
+    "hash-password": "node scripts/hash-password.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/iagokoch/plataforma-de-microaprendizado.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Iago Koch",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
