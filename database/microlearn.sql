@@ -2,7 +2,7 @@
 DROP DATABASE IF EXISTS microlearn;
 
 -- Criar o banco de dados
-CREATE DATABASE microlearn;
+CREATE DATABASE microlearn CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE microlearn;
 
 -- Tabela de usuários
@@ -20,13 +20,33 @@ CREATE TABLE usuarios (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de perguntas da comunidade
+-- Tabela de matérias
+CREATE TABLE materias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- Tabela de perguntas
+-- Guarda dois tipos de pergunta, como o código usa:
+--   * dúvidas da comunidade (fórum): usuario_id preenchido, materia_id NULL
+--   * perguntas do quiz de uma matéria: materia_id preenchido
 CREATE TABLE perguntas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     texto TEXT NOT NULL,
     usuario_id INT,
+    materia_id INT DEFAULT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+    FOREIGN KEY (materia_id) REFERENCES materias(id) ON DELETE CASCADE
+);
+
+-- Alternativas das perguntas do quiz (uma marcada como correta)
+CREATE TABLE alternativas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pergunta_id INT NOT NULL,
+    texto VARCHAR(255) NOT NULL,
+    correta BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (pergunta_id) REFERENCES perguntas(id) ON DELETE CASCADE
 );
 
 -- Tabela de respostas para as perguntas
@@ -38,12 +58,6 @@ CREATE TABLE respostas (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pergunta_id) REFERENCES perguntas(id) ON DELETE CASCADE,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
-);
-
--- Nova Tabela de matérias
-CREATE TABLE materias (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL UNIQUE
 );
 
 -- Tabela de aulas
@@ -62,6 +76,7 @@ CREATE TABLE aulas_assistidas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     aula_id INT NOT NULL,
+    status ENUM('em_andamento', 'concluida') NOT NULL DEFAULT 'em_andamento',
     data_assistida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (aula_id) REFERENCES aulas(id) ON DELETE CASCADE,
@@ -89,9 +104,10 @@ CREATE TABLE password_reset_tokens (
 );
 
 -- Inserir algumas matérias de exemplo
+-- (os nomes precisam bater com as rotas em routes/index.js: /matematica, /ciencias, /lingua-portuguesa...)
 INSERT INTO materias (nome) VALUES 
 ('Matemática'),
-('Português'),
+('Língua Portuguesa'),
 ('História'),
 ('Geografia'),
 ('Física'),
@@ -99,10 +115,22 @@ INSERT INTO materias (nome) VALUES
 ('Biologia'),
 ('Filosofia'),
 ('Sociologia'),
-('Arte');
+('Arte'),
+('Ciências');
 
 -- Inserir algumas aulas de exemplo
 INSERT INTO aulas (titulo, video_url, materia_id) VALUES 
 ('Introdução à Álgebra', 'https://www.youtube.com/embed/example1', 1),
 ('Gramática Básica', 'https://www.youtube.com/embed/example2', 2),
-('História do Brasil', 'https://www.youtube.com/embed/example3', 3); 
+('História do Brasil', 'https://www.youtube.com/embed/example3', 3);
+
+-- Perguntas de quiz de exemplo (materia_id: 1 = Matemática, 2 = Língua Portuguesa, 3 = História)
+INSERT INTO perguntas (texto, materia_id) VALUES
+('Qual o valor de x na equação 2x + 4 = 10?', 1),
+('Qual destas palavras é um substantivo?', 2),
+('Em que ano foi proclamada a Independência do Brasil?', 3);
+
+INSERT INTO alternativas (pergunta_id, texto, correta) VALUES
+(1, 'x = 2', FALSE), (1, 'x = 3', TRUE), (1, 'x = 7', FALSE),
+(2, 'Correr', FALSE), (2, 'Bonito', FALSE), (2, 'Casa', TRUE),
+(3, '1500', FALSE), (3, '1822', TRUE), (3, '1889', FALSE);

@@ -67,7 +67,10 @@ router.get("/aula/:id", (req, res) => {
       `INSERT INTO aulas_assistidas (usuario_id, aula_id, status)
        VALUES (?, ?, 'em_andamento')
        ON DUPLICATE KEY UPDATE status = 'em_andamento', data_assistida = CURRENT_TIMESTAMP`,
-      [userId, aulaId]
+      [userId, aulaId],
+      (err) => {
+        if (err) console.error("Erro ao registrar aula em andamento:", err.message);
+      }
     );
   }
 

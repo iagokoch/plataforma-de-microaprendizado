@@ -26,6 +26,7 @@ router.get("/", (req, res) => {
     FROM perguntas p
     LEFT JOIN usuarios u ON p.usuario_id = u.id
     LEFT JOIN respostas r ON p.id = r.pergunta_id
+    WHERE p.materia_id IS NULL -- só dúvidas da comunidade; perguntas de quiz têm materia_id
     ORDER BY p.data_criacao DESC, r.data_criacao ASC
   `;
 

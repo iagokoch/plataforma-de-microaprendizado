@@ -332,9 +332,9 @@ router.get("/progresso", requireLogin, async (req, res) => {
       `SELECT COUNT(*) as total FROM aulas_assistidas WHERE usuario_id = ?`,
       [userId]
     );
-    // Total de tarefas concluídas
+    // Total de tarefas concluídas (aulas com quiz finalizado, as mesmas de "Minhas Tarefas")
     const [tarefasConcluidas] = await pool.execute(
-      `SELECT COUNT(*) as total FROM tarefas WHERE usuario_id = ? AND concluida = TRUE`,
+      `SELECT COUNT(*) as total FROM aulas_assistidas WHERE usuario_id = ? AND status = 'concluida'`,
       [userId]
     );
     // Progresso por matéria
