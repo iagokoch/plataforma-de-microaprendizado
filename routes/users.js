@@ -10,16 +10,38 @@ const multer = require('multer');
 const path = require('path');
 
 // Configuração do multer para salvar em public/uploads
+// Só aceita imagens (até 2 MB). A extensão vem do tipo validado, não do nome enviado,
+// para impedir o upload de .html/.js que seriam servidos pela pasta public.
+const TIPOS_IMAGEM = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif" };
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, '../public/uploads'));
   },
   filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    cb(null, 'user_' + req.user.id + '_' + Date.now() + ext);
+    cb(null, 'user_' + req.user.id + '_' + Date.now() + TIPOS_IMAGEM[file.mimetype]);
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (TIPOS_IMAGEM[file.mimetype]) return cb(null, true);
+    cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", "foto"));
+  },
+});
+
+// Envolve o multer para responder erros de upload em JSON (400) em vez de erro 500 em HTML
+const uploadFoto = (req, res, next) => {
+  upload.single('foto')(req, res, (err) => {
+    if (err) {
+      const mensagem = err.code === 'LIMIT_FILE_SIZE'
+        ? 'A imagem deve ter no máximo 2 MB.'
+        : 'Envie uma imagem JPG, PNG, WEBP ou GIF.';
+      return res.status(400).json({ sucesso: false, mensagem });
+    }
+    next();
+  });
+};
 
 // Rota de registro
 router.post("/register", async (req, res) => {
@@ -185,7 +207,8 @@ router.post("/forgot-password-request", async (req, res) => {
       },
     });
 
-    const resetLink = `http://localhost:3001/reset-password/${token}`; // Substitua localhost:3001 pela URL do seu site em produção
+    const appUrl = process.env.APP_URL || `http://localhost:${process.env.PORT || 3001}`;
+    const resetLink = `${appUrl}/reset-password/${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER, // Remetente
@@ -357,7 +380,7 @@ router.get('/logout', (req, res) => {
 });
 
 // Rota para upload de foto de perfil
-router.post('/upload-foto', requireLogin, upload.single('foto'), async (req, res) => {
+router.post('/upload-foto', requireLogin, uploadFoto, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ sucesso: false, mensagem: 'Nenhum arquivo enviado.' });
@@ -372,7 +395,7 @@ router.post('/upload-foto', requireLogin, upload.single('foto'), async (req, res
 });
 
 // Rota para atualizar dados pessoais e foto de perfil
-router.post('/atualizar-perfil', requireLogin, upload.single('foto'), async (req, res) => {
+router.post('/atualizar-perfil', requireLogin, uploadFoto, async (req, res) => {
   try {
     const { nome, email, telefone } = req.body;
     let query = 'UPDATE usuarios SET nome = ?, email = ?, telefone = ?';

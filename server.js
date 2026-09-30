@@ -1,3 +1,5 @@
+require("dotenv").config(); // Carregar o .env ANTES de qualquer módulo que leia process.env
+
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
@@ -5,9 +7,11 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const db = require("./database/connection"); // Importar a conexão com o banco
 const bcrypt = require("bcrypt"); // Para comparar senhas
-const dotenv = require("dotenv"); // Importar dotenv
 
-dotenv.config(); // Carregar variáveis de ambiente do .env
+if (!process.env.SESSION_SECRET) {
+  console.error("Defina SESSION_SECRET no arquivo .env (veja .env.example).");
+  process.exit(1);
+}
 
 // Importar rotas
 const indexRouter = require("./routes/index");
@@ -28,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     name: 'user.sid',
-    secret: "seu_segredo_muito_secreto", // Substitua por uma string aleatória forte
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 horas
@@ -38,6 +42,9 @@ app.use(
 // Inicializar Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Mesma mensagem para usuário inexistente e senha errada, para não revelar quais e-mails/CPFs têm conta
+const MSG_LOGIN_INVALIDO = "E-mail/CPF ou senha inválidos";
 
 // Configurar estratégia local do Passport
 passport.use(
@@ -50,7 +57,6 @@ passport.use(
     async (req, emailCpf, senha, done) => {
       try {
         console.log("Attempting login for:", emailCpf);
-        console.log("Provided password (plain):", senha); // CUIDADO: APENAS PARA DEBUG
         const sql = "SELECT * FROM usuarios WHERE email = ? OR cpf = ?";
         db.query(sql, [emailCpf, emailCpf], async (err, results) => {
           if (err) {
@@ -59,17 +65,16 @@ passport.use(
           }
           if (results.length === 0) {
             console.log("User not found for:", emailCpf);
-            return done(null, false, { message: "Usuário não encontrado" });
+            return done(null, false, { message: MSG_LOGIN_INVALIDO });
           }
 
           const user = results[0];
           console.log("User found:", user.email || user.cpf);
-          console.log("Stored hashed password:", user.senha); // CUIDADO: APENAS PARA DEBUG
           const senhaCorreta = await bcrypt.compare(senha, user.senha);
 
           if (!senhaCorreta) {
             console.log("Incorrect password for:", user.email || user.cpf);
-            return done(null, false, { message: "Senha incorreta" });
+            return done(null, false, { message: MSG_LOGIN_INVALIDO });
           }
 
           console.log("Authentication successful for:", user.email || user.cpf);

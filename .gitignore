@@ -1,0 +1,27 @@
+# Dependências (reinstaladas com `npm install` a partir do package-lock.json)
+node_modules/
+
+# Variáveis de ambiente com segredos (use .env.example como modelo)
+.env
+.env.*
+!.env.example
+
+# Uploads feitos pelos usuários em tempo de execução
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Dumps locais do banco (o schema oficial fica em database/microlearn.sql)
+*.sql.gz
+schema.sql
+backup*.sql
+
+# Sistema operacional / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

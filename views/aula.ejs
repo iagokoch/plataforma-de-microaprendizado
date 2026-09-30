@@ -283,8 +283,8 @@
             document.addEventListener('DOMContentLoaded', function() {
               const form = document.getElementById('quiz-form');
               if (form) {
-                const perguntas = <%- JSON.stringify(perguntas) %>;
-                const alternativas = <%- JSON.stringify(alternativas) %>;
+                const perguntas = <%- JSON.stringify(perguntas).replace(/</g, '\\u003c') %>;
+                const alternativas = <%- JSON.stringify(alternativas).replace(/</g, '\\u003c') %>;
                 form.addEventListener('submit', function(e) { e.preventDefault(); });
                 document.getElementById('btn-concluir').onclick = function() {
                   let allCorrect = true;

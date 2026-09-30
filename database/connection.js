@@ -1,11 +1,7 @@
 const mysql = require("mysql2");
+const dbConfig = require("../config/db-config");
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "", // ALTERE AQUI SE VOCÊ DEFINIU UMA SENHA NO XAMPP!
-  database: "microlearn",
-});
+const db = mysql.createConnection(dbConfig);
 
 db.connect((err) => {
   if (err) {
@@ -13,7 +9,7 @@ db.connect((err) => {
     // Em uma aplicação real, você pode querer parar o servidor ou ter um tratamento de erro melhor
     // process.exit(1); // Exemplo: encerrar se não conectar
   } else {
-    console.log("Conectado ao banco de dados MySQL (XAMPP).");
+    console.log("Conectado ao banco de dados MySQL.");
   }
 });
 
