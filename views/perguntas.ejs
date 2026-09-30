@@ -276,6 +276,17 @@
       const perguntaInput = document.getElementById("perguntaInput");
       const enviarPerguntaBtn = document.getElementById("enviarPerguntaBtn");
       const duvidasList = document.querySelector(".duvidas-list");
+      const usuarioLogadoId = <%= user && user.id ? Number(user.id) : 'null' %>;
+
+      // Escapa texto digitado por usuários antes de inserir via innerHTML (evita XSS armazenado)
+      function escapeHtml(valor) {
+        return String(valor ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
 
       // Function to fetch and display questions
       async function fetchAndDisplayQuestions() {
@@ -295,19 +306,19 @@
             const perguntaItem = document.createElement("div");
             perguntaItem.classList.add("duvida-item");
             let excluirBtn = '';
-            if (q.autor_nome && q.autor_nome === "<%= user ? user.nome : '' %>") {
+            if (usuarioLogadoId !== null && q.autor_id === usuarioLogadoId) {
               excluirBtn = `<button class='excluir-pergunta-btn' style='margin-left:8px;background:#ff6b6b;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;'>Excluir</button>`;
             }
             perguntaItem.innerHTML = `
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-                <img src="${q.autor_foto ? q.autor_foto : '/images/logo-microlearn.png'}" alt="Foto do autor" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
-                <span style="font-weight: bold; color: #7950f2;">${q.autor_nome ? q.autor_nome : 'Usuário'}</span>
+                <img src="${escapeHtml(q.autor_foto || '/images/logo-microlearn.png')}" alt="Foto do autor" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                <span style="font-weight: bold; color: #7950f2;">${escapeHtml(q.autor_nome || 'Usuário')}</span>
                 ${excluirBtn}
               </div>
-              <div class="duvida-titulo">${q.texto}</div>
+              <div class="duvida-titulo">${escapeHtml(q.texto)}</div>
               <div class="respostas">
                 ${q.respostas.length > 0 ? "<strong>Respostas:</strong>" : ""}
-                ${q.respostas.map((r) => `<p>- ${r.texto}</p>`).join("")}
+                ${q.respostas.map((r) => `<p>- ${escapeHtml(r.texto)}</p>`).join("")}
                 ${
                   q.respostas.length === 0
                     ? "<p>Nenhuma resposta ainda.</p>"
@@ -347,7 +358,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ texto: perguntaTexto, usuario_id: "<%= user && user.id ? user.id : '' %>" }),
+            body: JSON.stringify({ texto: perguntaTexto }),
           });
 
           if (response.ok) {
@@ -423,7 +434,6 @@
             fetch(`/api/perguntas/${perguntaId}`, {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ usuario_id: "<%= user && user.id ? user.id : '' %>" })
             })
             .then(res => res.json())
             .then(data => {
@@ -457,19 +467,19 @@
             const perguntaItem = document.createElement("div");
             perguntaItem.classList.add("duvida-item");
             let excluirBtn = '';
-            if (q.autor_nome && q.autor_nome === "<%= user ? user.nome : '' %>") {
+            if (usuarioLogadoId !== null && q.autor_id === usuarioLogadoId) {
               excluirBtn = `<button class='excluir-pergunta-btn' style='margin-left:8px;background:#ff6b6b;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;'>Excluir</button>`;
             }
             perguntaItem.innerHTML = `
               <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-                <img src="${q.autor_foto ? q.autor_foto : '/images/logo-microlearn.png'}" alt="Foto do autor" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
-                <span style="font-weight: bold; color: #7950f2;">${q.autor_nome ? q.autor_nome : 'Usuário'}</span>
+                <img src="${escapeHtml(q.autor_foto || '/images/logo-microlearn.png')}" alt="Foto do autor" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                <span style="font-weight: bold; color: #7950f2;">${escapeHtml(q.autor_nome || 'Usuário')}</span>
                 ${excluirBtn}
               </div>
-              <div class="duvida-titulo">${q.texto}</div>
+              <div class="duvida-titulo">${escapeHtml(q.texto)}</div>
               <div class="respostas">
                 ${q.respostas.length > 0 ? "<strong>Respostas:</strong>" : ""}
-                ${q.respostas.map((r) => `<p>- ${r.texto}</p>`).join("")}
+                ${q.respostas.map((r) => `<p>- ${escapeHtml(r.texto)}</p>`).join("")}
                 ${q.respostas.length === 0 ? "<p>Nenhuma resposta ainda.</p>" : ""}
               </div>
               <button class="responder-btn" style="margin-top:8px;background:#7950f2;color:#fff;border:none;padding:6px 18px;border-radius:6px;cursor:pointer;">Responder</button>

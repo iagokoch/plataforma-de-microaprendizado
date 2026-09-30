@@ -43,6 +43,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Mesma mensagem para usuário inexistente e senha errada, para não revelar quais e-mails/CPFs têm conta
+const MSG_LOGIN_INVALIDO = "E-mail/CPF ou senha inválidos";
+
 // Configurar estratégia local do Passport
 passport.use(
   new LocalStrategy(
@@ -54,7 +57,6 @@ passport.use(
     async (req, emailCpf, senha, done) => {
       try {
         console.log("Attempting login for:", emailCpf);
-        console.log("Provided password (plain):", senha); // CUIDADO: APENAS PARA DEBUG
         const sql = "SELECT * FROM usuarios WHERE email = ? OR cpf = ?";
         db.query(sql, [emailCpf, emailCpf], async (err, results) => {
           if (err) {
@@ -63,17 +65,16 @@ passport.use(
           }
           if (results.length === 0) {
             console.log("User not found for:", emailCpf);
-            return done(null, false, { message: "Usuário não encontrado" });
+            return done(null, false, { message: MSG_LOGIN_INVALIDO });
           }
 
           const user = results[0];
           console.log("User found:", user.email || user.cpf);
-          console.log("Stored hashed password:", user.senha); // CUIDADO: APENAS PARA DEBUG
           const senhaCorreta = await bcrypt.compare(senha, user.senha);
 
           if (!senhaCorreta) {
             console.log("Incorrect password for:", user.email || user.cpf);
-            return done(null, false, { message: "Senha incorreta" });
+            return done(null, false, { message: MSG_LOGIN_INVALIDO });
           }
 
           console.log("Authentication successful for:", user.email || user.cpf);

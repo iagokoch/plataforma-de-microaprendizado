@@ -4,12 +4,20 @@ const router = express.Router();
 // Importar a conexão com o banco de dados
 const db = require("../../database/connection");
 
+// Rotas que alteram dados exigem usuário logado. O autor é sempre o usuário da
+// sessão (req.user.id) — nunca um usuario_id enviado pelo navegador, que pode ser forjado.
+const requireAuthApi = (req, res, next) => {
+  if (req.isAuthenticated && req.isAuthenticated()) return next();
+  return res.status(401).json({ error: "Faça login para continuar." });
+};
+
 router.get("/", (req, res) => {
   const sql = `
     SELECT 
         p.id AS pergunta_id,
         p.texto AS pergunta_texto,
         p.data_criacao AS pergunta_data,
+        p.usuario_id AS autor_id,
         u.nome AS autor_nome,
         u.foto_perfil AS autor_foto,
         r.id AS resposta_id,
@@ -34,6 +42,7 @@ router.get("/", (req, res) => {
           id: row.pergunta_id,
           texto: row.pergunta_texto,
           data_criacao: row.pergunta_data,
+          autor_id: row.autor_id,
           autor_nome: row.autor_nome,
           autor_foto: row.autor_foto,
           respostas: [],
@@ -52,14 +61,15 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/", (req, res) => {
-  const { texto, usuario_id } = req.body;
+router.post("/", requireAuthApi, (req, res) => {
+  const { texto } = req.body;
+  const usuario_id = req.user.id;
   if (!texto) {
     return res.status(400).json({ error: "Question text is required" });
   }
 
   const sql = "INSERT INTO perguntas (texto, usuario_id) VALUES (?, ?)";
-  db.query(sql, [texto, usuario_id || null], (err, result) => {
+  db.query(sql, [texto, usuario_id], (err, result) => {
     if (err) {
       console.error("Error inserting question:", err);
       return res.status(500).json({ error: "Error saving question" });
@@ -73,16 +83,17 @@ router.post("/", (req, res) => {
   });
 });
 
-router.post("/:perguntaId/respostas", (req, res) => {
+router.post("/:perguntaId/respostas", requireAuthApi, (req, res) => {
   const { perguntaId } = req.params;
-  const { texto, usuario_id } = req.body;
+  const { texto } = req.body;
+  const usuario_id = req.user.id;
   if (!texto) {
     return res.status(400).json({ error: "Answer text is required" });
   }
 
   const sql =
     "INSERT INTO respostas (pergunta_id, texto, usuario_id) VALUES (?, ?, ?)";
-  db.query(sql, [perguntaId, texto, usuario_id || null], (err, result) => {
+  db.query(sql, [perguntaId, texto, usuario_id], (err, result) => {
     if (err) {
       console.error("Error inserting answer:", err);
       return res.status(500).json({ error: "Error saving answer" });
@@ -98,12 +109,9 @@ router.post("/:perguntaId/respostas", (req, res) => {
 });
 
 // Rota para deletar uma pergunta (apenas pelo autor)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireAuthApi, (req, res) => {
   const perguntaId = req.params.id;
-  const usuarioId = req.body.usuario_id;
-  if (!usuarioId) {
-    return res.status(401).json({ error: 'Usuário não autenticado' });
-  }
+  const usuarioId = req.user.id;
   // Verifica se a pergunta pertence ao usuário
   const sqlCheck = 'SELECT usuario_id FROM perguntas WHERE id = ?';
   db.query(sqlCheck, [perguntaId], (err, results) => {
